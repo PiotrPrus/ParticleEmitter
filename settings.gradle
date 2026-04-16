@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 rootProject.name = "ParticleEmitter"
 include ':particle-emitter'
 include ':sample'
+include ':app'
+project(':app').projectDir = file('sample')

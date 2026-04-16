@@ -20,9 +20,9 @@ fun MultiEmitter(
     onAnimationFinished: () -> Unit = {}
 ) {
 
-    val emitters = remember { mutableStateListOf<EmitterConfig>() }
+    val emitters = remember(emitterConfig, emitterCount, emitterDelay) { mutableStateListOf<EmitterConfig>() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(emitterConfig, emitterCount, emitterDelay) {
         repeat(emitterCount) {
             emitters.add(emitterConfig.copy(id = it.toString()))
             delay(emitterDelay)

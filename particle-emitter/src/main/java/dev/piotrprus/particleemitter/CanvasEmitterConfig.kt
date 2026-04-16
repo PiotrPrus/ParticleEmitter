@@ -58,9 +58,6 @@ data class CanvasEmitterConfig(
     val startScaleRange: IntRange = IntRange(0,1),
     val targetScaleRange: IntRange = IntRange(1,2)
 ) {
-    val particlesIn100ms
-        get() = particlePerSecond.div(10).coerceAtLeast(1)
-
     val startPoint: DpOffset
         get() = when (startRegionShape) {
             Shape.OVAL -> getRandomOffsetOnCircle(emitterCenter, startRegionSize)

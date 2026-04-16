@@ -18,19 +18,27 @@ import java.util.UUID
 @Composable
 fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 
-    val itemsToAnimate = remember { mutableStateOf<List<CanvasParticle>>(emptyList()) }
-    val lastEmitTime = remember { mutableStateOf(0L) }
+    val itemsToAnimate = remember(config) { mutableStateOf<List<CanvasParticle>>(emptyList()) }
+    val lastFrameTime = remember(config) { mutableStateOf(0L) }
+    val pendingParticles = remember(config) { mutableStateOf(0f) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(config) {
         while (true) {
             withContext(Dispatchers.IO) {
                 withFrameNanos { frameNano ->
-                    val items = itemsToAnimate.value + addNewIfTime(
-                        config = config,
-                        currentTimeNano = frameNano,
-                        lastUpdateTime = lastEmitTime.value
-                    ).also { if (it.isNotEmpty()) lastEmitTime.value = frameNano }
-                    itemsToAnimate.value = items.mapNotNull { canvasParticle ->
+                    val newParticles = if (lastFrameTime.value == 0L) {
+                        lastFrameTime.value = frameNano
+                        emptyList()
+                    } else {
+                        val deltaSeconds = (frameNano - lastFrameTime.value) / 1_000_000_000.0
+                        lastFrameTime.value = frameNano
+                        pendingParticles.value += (config.particlePerSecond * deltaSeconds).toFloat()
+                        val count = pendingParticles.value.toInt()
+                        pendingParticles.value -= count
+                        createParticles(config, count)
+                    }
+
+                    itemsToAnimate.value = (itemsToAnimate.value + newParticles).mapNotNull { canvasParticle ->
                         val playTime = frameNano - canvasParticle.startTime
                         if (playTime > canvasParticle.lifespan.times(1_000_000L)) {
                             null
@@ -63,54 +71,28 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
         })
 }
 
-private fun addNewIfTime(
+private fun createParticles(
     config: CanvasEmitterConfig,
-    currentTimeNano: Long,
-    lastUpdateTime: Long
+    count: Int
 ): List<CanvasParticle> =
-    when {
-        lastUpdateTime == 0L -> List(config.particlesIn100ms) {
-            CanvasParticle(
-                id = UUID.randomUUID().toString(),
-                shape = config.particleShapes.random(),
-                color = config.colors.random(),
-                startPoint = config.startPoint,
-                lifespan = config.lifespanRange.random(),
-                easing = config.translateEasing,
-                blendMode = config.blendMode,
-                size = config.particleSizes.random(),
-                angle = config.spread.random(),
-                distance = config.flyDistancesDp.random().dp,
-                fadeOutDuration = config.fadeOutTime.random(),
-                rotation = config.rotationRange.random(),
-                alphaEasing = config.alphaEasing,
-                scaleDuration = config.scaleTime.random(),
-                scaleEasing = config.scaleEasing,
-                targetScale = config.targetScaleRange.random().toFloat(),
-                startScale = config.startScaleRange.random().toFloat(),
-            )
-        }
-
-        currentTimeNano - lastUpdateTime < 100_000_000L -> emptyList()
-        else -> List(config.particlesIn100ms) {
-            CanvasParticle(
-                id = UUID.randomUUID().toString(),
-                shape = config.particleShapes.random(),
-                color = config.colors.random(),
-                startPoint = config.startPoint,
-                lifespan = config.lifespanRange.random(),
-                easing = config.translateEasing,
-                blendMode = config.blendMode,
-                size = config.particleSizes.random(),
-                angle = config.spread.random(),
-                distance = config.flyDistancesDp.random().dp,
-                fadeOutDuration = config.fadeOutTime.random(),
-                rotation = config.rotationRange.random(),
-                alphaEasing = config.alphaEasing,
-                scaleDuration = config.scaleTime.random(),
-                scaleEasing = config.scaleEasing,
-                targetScale = config.targetScaleRange.random().toFloat(),
-                startScale = config.startScaleRange.random().toFloat(),
-            )
-        }
+    List(count) {
+        CanvasParticle(
+            id = UUID.randomUUID().toString(),
+            shape = config.particleShapes.random(),
+            color = config.colors.random(),
+            startPoint = config.startPoint,
+            lifespan = config.lifespanRange.random(),
+            easing = config.translateEasing,
+            blendMode = config.blendMode,
+            size = config.particleSizes.random(),
+            angle = config.spread.random(),
+            distance = config.flyDistancesDp.random().dp,
+            fadeOutDuration = config.fadeOutTime.random(),
+            rotation = config.rotationRange.random(),
+            alphaEasing = config.alphaEasing,
+            scaleDuration = config.scaleTime.random(),
+            scaleEasing = config.scaleEasing,
+            targetScale = config.targetScaleRange.random().toFloat(),
+            startScale = config.startScaleRange.random().toFloat(),
+        )
     }

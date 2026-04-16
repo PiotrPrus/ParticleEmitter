@@ -34,11 +34,11 @@ fun ParticlesEmitter(
     config: EmitterConfig,
     onAnimationFinished: () -> Unit
 ) {
-    val particles = remember { mutableStateListOf<Particle>() }
+    val particles = remember(config) { mutableStateListOf<Particle>() }
 
     BoxWithConstraints(modifier = modifier) {
         val constraintsScope = this
-        val startingPoint: IntOffset by remember {
+        val startingPoint: IntOffset by remember(config) {
             mutableStateOf(
                 IntOffset(
                     x = if (config.randomStartPoint) Random.nextInt(
@@ -53,7 +53,7 @@ fun ParticlesEmitter(
             )
         }
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(config) {
             when (config.emitDurationMillis) {
                 0L -> {
                     particles.addAll(List(config.particlesCount) {
