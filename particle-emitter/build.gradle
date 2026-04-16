@@ -47,7 +47,7 @@ mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
 
-    coordinates("io.github.piotrprus", "particle-emitter", "1.0.0")
+    coordinates("io.github.piotrprus", "particle-emitter", "1.0.1")
 
     pom {
         name = "ParticleEmitter"
