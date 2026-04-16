@@ -14,6 +14,32 @@ A Jetpack Compose particle effects library for Android. Create beautiful, physic
 - **Multi-emitter orchestration** — Sequential or overlapping emitters with `MultiEmitter`
 - **Emitter source shapes** — Point, oval, rectangle, vertical/horizontal lines
 
+## Installation
+
+Add the dependency to your module's `build.gradle`:
+
+```groovy
+dependencies {
+    implementation "io.github.piotrprus:particle-emitter:1.0.1"
+}
+```
+
+or with Kotlin DSL:
+
+```kotlin
+dependencies {
+    implementation("io.github.piotrprus:particle-emitter:1.0.1")
+}
+```
+
+Make sure you have `mavenCentral()` in your project's repositories:
+
+```groovy
+repositories {
+    mavenCentral()
+}
+```
+
 ## Modules
 
 | Module | Description |
