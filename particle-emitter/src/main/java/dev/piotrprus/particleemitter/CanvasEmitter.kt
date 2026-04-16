@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -18,24 +20,26 @@ import java.util.UUID
 @Composable
 fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 
-    val itemsToAnimate = remember(config) { mutableStateOf<List<CanvasParticle>>(emptyList()) }
-    val lastFrameTime = remember(config) { mutableStateOf(0L) }
-    val pendingParticles = remember(config) { mutableStateOf(0f) }
+    val itemsToAnimate = remember { mutableStateOf<List<CanvasParticle>>(emptyList()) }
+    val lastFrameTime = remember { mutableStateOf(0L) }
+    val pendingParticles = remember { mutableStateOf(0f) }
+    val currentConfig by rememberUpdatedState(config)
 
-    LaunchedEffect(config) {
+    LaunchedEffect(Unit) {
         while (true) {
             withContext(Dispatchers.IO) {
                 withFrameNanos { frameNano ->
+                    val cfg = currentConfig
                     val newParticles = if (lastFrameTime.value == 0L) {
                         lastFrameTime.value = frameNano
                         emptyList()
                     } else {
                         val deltaSeconds = (frameNano - lastFrameTime.value) / 1_000_000_000.0
                         lastFrameTime.value = frameNano
-                        pendingParticles.value += (config.particlePerSecond * deltaSeconds).toFloat()
+                        pendingParticles.value += (cfg.particlePerSecond * deltaSeconds).toFloat()
                         val count = pendingParticles.value.toInt()
                         pendingParticles.value -= count
-                        createParticles(config, count)
+                        createParticles(cfg, count)
                     }
 
                     itemsToAnimate.value = (itemsToAnimate.value + newParticles).mapNotNull { canvasParticle ->
