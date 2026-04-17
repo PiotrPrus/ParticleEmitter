@@ -171,13 +171,15 @@ ParticleShape.PathShape(myCustomPath)
 
 The sample app includes interactive demos:
 
-| Screen | Description |
-|--------|-------------|
-| **Canvas Emitter** | Star particles with birth rate slider |
-| **Confetti** | Multi-emitter confetti with emoji and glowing stars |
-| **Glow Particles** | Glowing particles with blur and color animations |
-| **Gravity** | Canvas particles with gravity on/off toggle |
-| **Gravity Point** | Draggable gravity attractor with force slider |
+| Canvas Emitter | Confetti | Glow Particles |
+|:-:|:-:|:-:|
+| ![Canvas Emitter](media/canvas_emitter.gif) | ![Confetti](media/confetti.gif) | ![Glow Particles](media/glow.gif) |
+| Star particles with birth rate slider | Multi-emitter confetti with emoji and glowing stars | Glowing particles with blur and color animations |
+
+| Gravity | Gravity Point |
+|:-:|:-:|
+| ![Gravity](media/gravity.gif) | ![Gravity Point](media/gravity_point.gif) |
+| Canvas particles with gravity on/off toggle | Draggable gravity attractor with force slider |
 
 ## Building
 
