@@ -16,6 +16,8 @@ import dev.piotrprus.particleemitter.ui.draw
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
@@ -47,8 +49,8 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
                         if (playTime > canvasParticle.lifespan.times(1_000_000L)) {
                             null
                         } else {
-                            val newPosition =
-                                canvasParticle.animationConfig.getValueFromNanos(playTimeNanos = playTime)
+                            val elapsedSeconds = playTime / 1_000_000_000.0
+                            val newPosition = canvasParticle.positionAt(elapsedSeconds)
                             val newScale =
                                 canvasParticle.scaleAnimConfig.getValueFromNanos(playTimeNanos = playTime)
                             val newAlpha =
@@ -78,19 +80,31 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 private fun createParticles(
     config: CanvasEmitterConfig,
     count: Int
-): List<CanvasParticle> =
-    List(count) {
+): List<CanvasParticle> {
+    val gravityRadians = Math.toRadians(config.gravityAngle.toDouble())
+    val gravityXDp = (config.gravityStrength * -sin(gravityRadians).toFloat()).dp
+    val gravityYDp = (config.gravityStrength * cos(gravityRadians).toFloat()).dp
+
+    return List(count) {
+        val angle = config.spread.random()
+        val radians = Math.toRadians(angle.toDouble())
+        val force = config.initialForce.random()
+        val vx = (force * sin(radians).toFloat()).dp
+        val vy = (-force * cos(radians).toFloat()).dp
+
         CanvasParticle(
             id = UUID.randomUUID().toString(),
             shape = config.particleShapes.random(),
             color = config.colors.random(),
             startPoint = config.startPoint,
             lifespan = config.lifespanRange.random(),
-            easing = config.translateEasing,
             blendMode = config.blendMode,
             size = config.particleSizes.random(),
-            angle = config.spread.random(),
-            distance = config.flyDistancesDp.random().dp,
+            angle = angle,
+            velocityX = vx,
+            velocityY = vy,
+            gravityX = gravityXDp,
+            gravityY = gravityYDp,
             fadeOutDuration = config.fadeOutTime.random(),
             rotation = config.rotationRange.random(),
             alphaEasing = config.alphaEasing,
@@ -100,3 +114,4 @@ private fun createParticles(
             startScale = config.startScaleRange.random().toFloat(),
         )
     }
+}

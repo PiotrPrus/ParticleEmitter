@@ -1,7 +1,6 @@
 package dev.piotrprus.particleemitter
 
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.TargetBasedAnimation
 import androidx.compose.animation.core.VectorConverter
@@ -11,8 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
-import kotlin.math.cos
-import kotlin.math.sin
+import androidx.compose.ui.unit.dp
 
 data class CanvasParticle(
     val id: String,
@@ -23,8 +21,10 @@ data class CanvasParticle(
     val fadeOutDuration: Int,
     val scaleDuration: Int,
     val size: DpSize,
-    val distance: Dp,
-    val easing: Easing,
+    val velocityX: Dp,
+    val velocityY: Dp,
+    val gravityX: Dp,
+    val gravityY: Dp,
     val scaleEasing: Easing,
     val alphaEasing: Easing,
     val currentPosition: DpOffset = startPoint,
@@ -37,22 +37,6 @@ data class CanvasParticle(
     val targetScale: Float,
     val startScale: Float,
 ) {
-    private val radians
-        get() = Math.toRadians(angle.toDouble())
-
-    private val endPoint: DpOffset
-        get() = DpOffset(
-            x = startPoint.x + distance * sin(radians).toFloat(),
-            y = startPoint.y - distance * cos(radians).toFloat()
-        )
-
-    val animationConfig: TargetBasedAnimation<DpOffset, AnimationVector2D>
-        get() = TargetBasedAnimation(
-            animationSpec = tween(durationMillis = lifespan, easing = easing),
-            typeConverter = DpOffset.VectorConverter,
-            initialValue = startPoint,
-            targetValue = endPoint
-        )
     val scaleAnimConfig: TargetBasedAnimation<Float, AnimationVector1D>
         get() = TargetBasedAnimation(
             animationSpec = tween(durationMillis = scaleDuration, easing = scaleEasing),
@@ -67,4 +51,11 @@ data class CanvasParticle(
             initialValue = 1f,
             targetValue = 0f
         )
+
+    fun positionAt(elapsedSeconds: Double): DpOffset {
+        val t = elapsedSeconds
+        val x = startPoint.x + velocityX * t.toFloat() + gravityX * (0.5f * t.toFloat() * t.toFloat())
+        val y = startPoint.y + velocityY * t.toFloat() + gravityY * (0.5f * t.toFloat() * t.toFloat())
+        return DpOffset(x, y)
+    }
 }

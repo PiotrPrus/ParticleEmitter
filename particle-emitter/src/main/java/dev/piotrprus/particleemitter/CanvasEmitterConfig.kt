@@ -2,7 +2,6 @@ package dev.piotrprus.particleemitter
 
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
@@ -22,18 +21,19 @@ import kotlin.math.sin
  * @param particleShapes - list of shapes for particles. The emitter will pick randomly from the list of available shapes
  * @param lifespanRange - duration of one particle. It is an IntRange to randomize the particle life
  * @param fadeOutTime - duration of fadeOut animation. Each particle can have random fadeOut time, so it is IntRange
- * @param scaleTime - duration of scaling animation. Use [startScale] and [targetScaleRange] to control the parameters of particle scale
+ * @param scaleTime - duration of scaling animation. Use [startScaleRange] and [targetScaleRange] to control the parameters of particle scale
  * @param colors - a list of colors that each particle will randomly pick from
- * @param particleSizes - a list of sizes in [DpSize] for each particle. It will be picked randomly from available sizes. The size can be also manipulated using [startScale] and [targetScaleRange]
- * @param spread - range of angles (in degrees) that describe the direction of path for each particle. The distance can be modify by [flyDistancesDp]
+ * @param particleSizes - a list of sizes in [DpSize] for each particle. It will be picked randomly from available sizes. The size can be also manipulated using [startScaleRange] and [targetScaleRange]
+ * @param spread - range of angles (in degrees) that describe the direction of path for each particle. 0 degrees points upward (top of the screen)
  * @param blendMode - applied [BlendMode] on each particle
- * @param translateEasing - an easing curve that is applied for move animation. It affects each particle acceleration to reach [flyDistancesDp]
  * @param alphaEasing - an easing curve that is applied for alpha animation on each particle
  * @param scaleEasing - an easing curve that is applied for scale animation on each particle
- * @param flyDistancesDp - an range of distances in Dp that each particle will translate from the source [emitterCenter]
+ * @param initialForce - initial velocity magnitude for each particle. Higher values make particles move faster from the emission point. The value is picked randomly from the provided range.
  * @param rotationRange - range of angles (in degrees) that each particle will rotate during translation
  * @param targetScaleRange - end scale for each particle
- * @param startScale - start scale for each particle
+ * @param startScaleRange - start scale for each particle
+ * @param gravityStrength - strength of gravitational force applied to particles in Dp/s². A value of 0 means no gravity. Higher values create stronger pull.
+ * @param gravityAngle - direction of gravity in degrees. 0 degrees points downward (bottom of the screen), 90 degrees points left, -90 degrees points right, 180 degrees points upward.
  *
  */
 
@@ -50,13 +50,14 @@ data class CanvasEmitterConfig(
     val particleSizes: List<DpSize>,
     val spread: IntRange = IntRange(-180, 180),
     val blendMode: BlendMode = BlendMode.SrcOver,
-    val translateEasing: Easing = LinearOutSlowInEasing,
     val alphaEasing: Easing = LinearEasing,
     val scaleEasing: Easing = LinearEasing,
-    val flyDistancesDp: IntRange = IntRange(10, 100),
+    val initialForce: IntRange = IntRange(10, 100),
     val rotationRange: IntRange = IntRange(-180, 180),
     val startScaleRange: IntRange = IntRange(0,1),
-    val targetScaleRange: IntRange = IntRange(1,2)
+    val targetScaleRange: IntRange = IntRange(1,2),
+    val gravityStrength: Float = 0f,
+    val gravityAngle: Int = 0,
 ) {
     val startPoint: DpOffset
         get() = when (startRegionShape) {

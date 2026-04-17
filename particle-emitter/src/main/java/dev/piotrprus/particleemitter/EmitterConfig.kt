@@ -3,7 +3,8 @@ package dev.piotrprus.particleemitter
 import androidx.compose.runtime.Composable
 
 /**
- * @param gravityMultiplier value in m/s2 of acceleration for particles. Negative values represent gravity towards top of the screen (sky)
+ * @param gravityStrength strength of gravitational force applied to particles in Dp/s². A value of 0 means no gravity. Higher values create stronger pull.
+ * @param gravityAngle direction of gravity in degrees. 0 degrees points downward (bottom of the screen), 90 degrees points left, -90 degrees points right, 180 degrees points upward.
  * @param particleLifespanMillis represent duration of each particle being presented on the screen
  * @param particlesCount number of particles emitted in one run
  * @param emitDurationMillis duration of animation in milliseconds. This is duration of emitter, not the whole animation.
@@ -20,7 +21,8 @@ data class EmitterConfig(
     val emitDurationMillis: Long = 0L,
     val particleLifespanMillis: Long = 2000L,
     val initialForce: Int = 100,
-    val gravityMultiplier: Float = 1f,
+    val gravityStrength: Float = 1f,
+    val gravityAngle: Int = 0,
     val spread: IntRange = IntRange(-180, 180),
     val maxHorizontalDisplacementDp: Int = 2000,
     val rotationMultiplier: Float = 1f,

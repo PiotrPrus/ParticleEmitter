@@ -11,12 +11,8 @@ import dev.piotrprus.particleemitter.ParticleShape
 import dev.piotrprus.particleemitter.ParticlesEmitter
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseInCirc
-import androidx.compose.animation.core.EaseInCubic
 import androidx.compose.animation.core.EaseOutBack
 import androidx.compose.animation.core.EaseOutCubic
-import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -28,6 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +46,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -86,9 +84,18 @@ import dev.piotrprus.particleemitter.sample.ui.theme.ParticleEmitterTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.border
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,6 +134,16 @@ fun SampleNavigation() {
         composable("glow") {
             SampleScaffold(title = "Glow Particles", onBack = { navController.popBackStack() }) {
                 Sample4()
+            }
+        }
+        composable("gravity") {
+            SampleScaffold(title = "Gravity", onBack = { navController.popBackStack() }) {
+                GravitySample()
+            }
+        }
+        composable("gravity_point") {
+            SampleScaffold(title = "Gravity Point", onBack = { navController.popBackStack() }) {
+                GravityPointSample()
             }
         }
     }
@@ -196,6 +213,18 @@ fun MainScreen(onSampleClick: (String) -> Unit) {
             description = "Glowing particles with blur and color animations",
             onClick = { onSampleClick("glow") }
         )
+
+        SampleButton(
+            title = "Gravity",
+            description = "Canvas particles with configurable gravity — toggle on/off",
+            onClick = { onSampleClick("gravity") }
+        )
+
+        SampleButton(
+            title = "Gravity Point",
+            description = "Drag a gravity attractor point to bend particle trajectories",
+            onClick = { onSampleClick("gravity_point") }
+        )
     }
 }
 
@@ -216,6 +245,270 @@ fun SampleButton(title: String, description: String, onClick: () -> Unit) {
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+@Composable
+fun GravitySample() {
+    val density = LocalDensity.current
+    val context = LocalContext.current
+    val imageBitmap =
+        remember { ImageBitmap.imageResource(context.resources, R.drawable.star_four) }
+    var gravityEnabled by remember { mutableStateOf(true) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .align(Alignment.Center),
+            contentAlignment = Alignment.Center
+        ) {
+            var avatarSize by remember { mutableStateOf(DpSize.Zero) }
+            var avatarCenter by remember { mutableStateOf(DpOffset.Zero) }
+
+            if (avatarSize != DpSize.Zero) {
+                CanvasParticleEmitter(
+                    modifier = Modifier.fillMaxSize(),
+                    CanvasEmitterConfig(
+                        particlePerSecond = 80,
+                        emitterCenter = avatarCenter,
+                        startRegionShape = CanvasEmitterConfig.Shape.POINT,
+                        startRegionSize = DpSize.Zero,
+                        particleShapes = listOf(
+                            ParticleShape.Circle,
+                            ParticleShape.Image(imageBitmap)
+                        ),
+                        lifespanRange = IntRange(4000, 6000),
+                        colors = listOf(
+                            Color(0xffFF6B6B), Color(0xffFFE66D), Color(0xff4ECDC4), Color(0xff45B7D1)
+                        ),
+                        blendMode = BlendMode.SrcOver,
+                        scaleEasing = EaseOutCubic,
+                        particleSizes = listOf(DpSize(6.dp, 6.dp), DpSize(10.dp, 10.dp)),
+                        initialForce = IntRange(40, 120),
+                        spread = IntRange(-60, 60),
+                        fadeOutTime = IntRange(1000, 1500),
+                        rotationRange = IntRange(-180, 180),
+                        scaleTime = IntRange(500, 800),
+                        targetScaleRange = IntRange(0, 1),
+                        startScaleRange = IntRange(1, 2),
+                        gravityStrength = if (gravityEnabled) 120f else 0f,
+                        gravityAngle = 0,
+                    )
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .onPlaced {
+                        avatarCenter = with(density) {
+                            DpOffset(
+                                x = (it.positionInParent().x + it.size.width / 2).toDp(),
+                                y = (it.positionInParent().y + it.size.height / 2).toDp()
+                            )
+                        }
+                        avatarSize = with(density) {
+                            DpSize(
+                                width = it.size.width.toDp(),
+                                height = it.size.height.toDp()
+                            )
+                        }
+                    }
+                    .background(color = Color(0xffFF6B6B), shape = CircleShape)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Gravity: ${if (gravityEnabled) "ON" else "OFF"}",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Switch(
+                    checked = gravityEnabled,
+                    onCheckedChange = { gravityEnabled = it }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun GravityPointSample() {
+    val density = LocalDensity.current
+    val context = LocalContext.current
+    val imageBitmap =
+        remember { ImageBitmap.imageResource(context.resources, R.drawable.star_four) }
+
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
+    var particleForce by remember { mutableStateOf(120f) }
+
+    // Emitter at center of the screen
+    val emitterCenter = with(density) {
+        DpOffset(
+            x = (containerSize.width / 2).toDp(),
+            y = (containerSize.height / 2).toDp()
+        )
+    }
+
+    // Gravity point — starts above center, draggable
+    var gravityPointPx by remember { mutableStateOf(Offset.Zero) }
+    val gravityPointInitialized = remember { mutableStateOf(false) }
+
+    // Initialize gravity point position once we know container size
+    if (containerSize != IntSize.Zero && !gravityPointInitialized.value) {
+        gravityPointPx = Offset(
+            x = containerSize.width / 2f,
+            y = containerSize.height * 0.3f
+        )
+        gravityPointInitialized.value = true
+    }
+
+    // Compute gravity angle and strength from emitter center to gravity point
+    val emitterPx = with(density) {
+        Offset(emitterCenter.x.toPx(), emitterCenter.y.toPx())
+    }
+    val dx = gravityPointPx.x - emitterPx.x
+    val dy = gravityPointPx.y - emitterPx.y
+    val distancePx = sqrt(dx * dx + dy * dy)
+    // atan2(-dx, dy) maps: down=0, left=90, right=-90, up=180
+    val gravityAngleDeg = Math.toDegrees(atan2(-dx.toDouble(), dy.toDouble())).toInt()
+    // Scale strength by distance — farther point = stronger pull
+    val maxDistance = sqrt(
+        (containerSize.width * containerSize.width + containerSize.height * containerSize.height).toFloat()
+    )
+    val gravityStrength = if (maxDistance > 0f) (distancePx / maxDistance) * 300f else 0f
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned { containerSize = it.size }
+    ) {
+        if (containerSize != IntSize.Zero && gravityPointInitialized.value) {
+            CanvasParticleEmitter(
+                modifier = Modifier.fillMaxSize(),
+                CanvasEmitterConfig(
+                    particlePerSecond = 60,
+                    emitterCenter = emitterCenter,
+                    startRegionShape = CanvasEmitterConfig.Shape.POINT,
+                    startRegionSize = DpSize.Zero,
+                    particleShapes = listOf(
+                        ParticleShape.Circle,
+                        ParticleShape.Image(imageBitmap)
+                    ),
+                    lifespanRange = IntRange(3000, 5000),
+                    colors = listOf(
+                        Color(0xffFF9A56), Color(0xffFF6B6B), Color(0xffFFE66D),
+                        Color(0xffFF4E8A), Color(0xffFFA726)
+                    ),
+                    blendMode = BlendMode.SrcOver,
+                    scaleEasing = EaseOutCubic,
+                    particleSizes = listOf(
+                        DpSize(5.dp, 5.dp), DpSize(8.dp, 8.dp), DpSize(12.dp, 12.dp)
+                    ),
+                    initialForce = IntRange(particleForce.toInt(), (particleForce * 1.3f).toInt()),
+                    spread = IntRange(-45, 45),
+                    fadeOutTime = IntRange(2000, 3500),
+                    rotationRange = IntRange(-180, 180),
+                    scaleTime = IntRange(500, 1000),
+                    targetScaleRange = IntRange(0, 1),
+                    startScaleRange = IntRange(1, 3),
+                    gravityStrength = gravityStrength,
+                    gravityAngle = gravityAngleDeg,
+                )
+            )
+        }
+
+        // Emitter source indicator
+        Box(
+            modifier = Modifier
+                .size(16.dp)
+                .offset {
+                    IntOffset(
+                        x = containerSize.width / 2 - with(density) { 8.dp.toPx() }.toInt(),
+                        y = containerSize.height / 2 - with(density) { 8.dp.toPx() }.toInt()
+                    )
+                }
+                .background(color = Color.White, shape = CircleShape)
+        )
+
+        // Draggable gravity point
+        if (gravityPointInitialized.value) {
+            Box(
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            x = (gravityPointPx.x - with(density) { 20.dp.toPx() }).toInt(),
+                            y = (gravityPointPx.y - with(density) { 20.dp.toPx() }).toInt()
+                        )
+                    }
+                    .size(40.dp)
+                    .border(2.dp, Color(0xffFF6B6B), CircleShape)
+                    .background(Color(0x44FF6B6B), CircleShape)
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            gravityPointPx = Offset(
+                                x = (gravityPointPx.x + dragAmount.x).coerceIn(
+                                    0f,
+                                    containerSize.width.toFloat()
+                                ),
+                                y = (gravityPointPx.y + dragAmount.y).coerceIn(
+                                    0f,
+                                    containerSize.height.toFloat()
+                                )
+                            )
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(Color(0xffFF6B6B), CircleShape)
+                )
+            }
+        }
+
+        // Info overlay
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
+            Text(
+                text = "Drag the circle to move gravity point",
+                color = Color.White.copy(alpha = 0.7f),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = "Angle: ${gravityAngleDeg}°  Strength: ${gravityStrength.toInt()}",
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Initial force: ${particleForce.toInt()}",
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Slider(
+                value = particleForce,
+                onValueChange = { particleForce = it },
+                valueRange = 20f..400f,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -253,10 +546,9 @@ fun CanvasSample() {
                             Color(0xff53FF00), Color(0xffE5FF5E), Color(0xff4AC2FF)
                         ),
                         blendMode = BlendMode.Screen,
-                        translateEasing = FastOutSlowInEasing,
                         scaleEasing = EaseOutCubic,
                         particleSizes = listOf(DpSize(8.dp, 8.dp)),
-                        flyDistancesDp = IntRange(40, 100),
+                        initialForce = IntRange(40, 100),
                         spread = IntRange(-180, 180),
                         fadeOutTime = IntRange(700, 1000),
                         rotationRange = IntRange(0, 90),
@@ -322,7 +614,7 @@ fun Sample4() {
             emitDurationMillis = 20000,
             particleLifespanMillis = 5000,
             initialForce = 40,
-            gravityMultiplier = 0.0f,
+            gravityStrength = 0.0f,
             spread = IntRange(-180, 180),
             maxHorizontalDisplacementDp = 100,
             rotationMultiplier = 0.5f,
@@ -367,7 +659,7 @@ fun Sample4() {
             emitDurationMillis = 20000,
             particleLifespanMillis = 5000,
             initialForce = 100,
-            gravityMultiplier = 0.0f,
+            gravityStrength = 0.0f,
             spread = IntRange(-180, 180),
             maxHorizontalDisplacementDp = 100,
             rotationMultiplier = 0.5f,
@@ -432,7 +724,7 @@ fun Sample3() {
                     emitDurationMillis = 0,
                     particleLifespanMillis = 3000,
                     initialForce = 140,
-                    gravityMultiplier = 0.2f,
+                    gravityStrength = 0.2f,
                     spread = IntRange(-30, 30),
                     maxHorizontalDisplacementDp = 2000,
                     rotationMultiplier = 0f,
@@ -469,7 +761,7 @@ fun Sample3() {
                     emitDurationMillis = 200,
                     particleLifespanMillis = 2000,
                     initialForce = 80,
-                    gravityMultiplier = 0.1f,
+                    gravityStrength = 0.1f,
                     spread = IntRange(-180, 180),
                     maxHorizontalDisplacementDp = 2000,
                     rotationMultiplier = 1f,
