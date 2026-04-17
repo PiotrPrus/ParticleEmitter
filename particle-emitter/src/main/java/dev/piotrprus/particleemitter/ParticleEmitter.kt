@@ -61,7 +61,8 @@ fun ParticlesEmitter(
                             id = it.toString(),
                             angle = config.spread.random(),
                             initialForce = config.initialForce,
-                            gravityMultiplier = config.gravityMultiplier,
+                            gravityStrength = config.gravityStrength,
+                            gravityAngle = config.gravityAngle,
                             lifespanMillis = config.particleLifespanMillis,
                             maxHorizontalDisplacementDp = config.maxHorizontalDisplacementDp,
                             rotationMultiplier = config.rotationMultiplier,
@@ -76,7 +77,8 @@ fun ParticlesEmitter(
                             id = it.toString(),
                             angle = config.spread.random(),
                             initialForce = config.initialForce,
-                            gravityMultiplier = config.gravityMultiplier,
+                            gravityStrength = config.gravityStrength,
+                            gravityAngle = config.gravityAngle,
                             lifespanMillis = config.particleLifespanMillis,
                             maxHorizontalDisplacementDp = config.maxHorizontalDisplacementDp,
                             rotationMultiplier = config.rotationMultiplier,
@@ -114,6 +116,9 @@ fun SingleParticleContainer(
     onLifeEnded: () -> Unit
 ) {
     val gravityDp = LocalDensity.current.density * 386 // 386 is gravity force in inch/s2
+    val gravityAccelX = gravityDp * particle.gravityStrength * sin(particle.gravityRadians).toFloat()
+    val gravityAccelY = gravityDp * particle.gravityStrength * cos(particle.gravityRadians).toFloat()
+
     val time by produceState(0.0) {
         while (true) {
             delay(16) // 16 millis is time of 1 frame in 60frame/sec
@@ -138,7 +143,7 @@ fun SingleParticleContainer(
     Box(modifier = Modifier
         .offset {
             IntOffset(
-                x = (startingPoint.x + time * particle.initialForce * sin(particle.radiants)).coerceIn(
+                x = (startingPoint.x + time * particle.initialForce * sin(particle.radiants) + 0.5 * gravityAccelX * time.pow(2)).coerceIn(
                     minimumValue = if (particle.maxHorizontalDisplacementDp == 0) {
                         Double.MIN_VALUE
                     } else {
@@ -150,7 +155,7 @@ fun SingleParticleContainer(
                         (startingPoint.x + particle.maxHorizontalDisplacementDp).toDouble()
                     }
                 ).dp.roundToPx(),
-                y = (startingPoint.y - particle.initialForce * cos(particle.radiants) * time + 0.5 * gravityDp * particle.gravityMultiplier * time.pow(
+                y = (startingPoint.y - particle.initialForce * cos(particle.radiants) * time + 0.5 * gravityAccelY * time.pow(
                     2
                 )).dp.roundToPx()
             )

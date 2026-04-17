@@ -6,7 +6,8 @@ data class Particle(
     val id: String,
     val angle: Int,
     val initialForce: Int,
-    val gravityMultiplier: Float,
+    val gravityStrength: Float,
+    val gravityAngle: Int,
     val lifespanMillis: Long,
     val maxHorizontalDisplacementDp: Int,
     val rotationMultiplier: Float,
@@ -14,4 +15,7 @@ data class Particle(
 ) {
     val radiants
         get() = Math.toRadians(angle.toDouble())
+
+    val gravityRadians
+        get() = Math.toRadians(gravityAngle.toDouble())
 }
