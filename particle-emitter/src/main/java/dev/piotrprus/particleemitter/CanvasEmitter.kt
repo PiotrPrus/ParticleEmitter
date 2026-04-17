@@ -82,7 +82,7 @@ private fun createParticles(
     count: Int
 ): List<CanvasParticle> {
     val gravityRadians = Math.toRadians(config.gravityAngle.toDouble())
-    val gravityXDp = (config.gravityStrength * sin(gravityRadians).toFloat()).dp
+    val gravityXDp = (config.gravityStrength * -sin(gravityRadians).toFloat()).dp
     val gravityYDp = (config.gravityStrength * cos(gravityRadians).toFloat()).dp
 
     return List(count) {

@@ -116,7 +116,7 @@ fun SingleParticleContainer(
     onLifeEnded: () -> Unit
 ) {
     val gravityDp = LocalDensity.current.density * 386 // 386 is gravity force in inch/s2
-    val gravityAccelX = gravityDp * particle.gravityStrength * sin(particle.gravityRadians).toFloat()
+    val gravityAccelX = gravityDp * particle.gravityStrength * -sin(particle.gravityRadians).toFloat()
     val gravityAccelY = gravityDp * particle.gravityStrength * cos(particle.gravityRadians).toFloat()
 
     val time by produceState(0.0) {
