@@ -3,6 +3,7 @@ package dev.piotrprus.particleemitter.sample
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.EmitterConfig
@@ -100,6 +101,7 @@ import kotlin.math.sqrt
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             ParticleEmitterTheme {
                 Surface(
@@ -119,7 +121,9 @@ fun SampleNavigation() {
 
     NavHost(navController = navController, startDestination = "main") {
         composable("main") {
-            MainScreen(onSampleClick = { route -> navController.navigate(route) })
+            SampleScaffold(title = "Particle Emitter Samples", onBack = { }) {
+                MainScreen(onSampleClick = { route -> navController.navigate(route) })
+            }
         }
         composable("canvas") {
             SampleScaffold(title = "Canvas Emitter", onBack = { navController.popBackStack() }) {
@@ -151,14 +155,16 @@ fun SampleNavigation() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SampleScaffold(title: String, onBack: () -> Unit, content: @Composable () -> Unit) {
+fun SampleScaffold(title: String, onBack: (() -> Unit)? = null, content: @Composable () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(title) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -188,14 +194,6 @@ fun MainScreen(onSampleClick: (String) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Particle Emitter Samples",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         SampleButton(
             title = "Canvas Emitter",
             description = "High-performance canvas-based particles with layered star effects",
