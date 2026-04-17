@@ -7,9 +7,10 @@ A Jetpack Compose particle effects library for Android. Create beautiful, physic
 - **Two rendering engines:**
   - `ParticlesEmitter` — Compose layout-based, supports custom `@Composable` particles (text, images, shapes)
   - `CanvasParticleEmitter` — Canvas-based, high-performance rendering for 100+ particles
-- **Physics simulation** — Gravity, force, angle, rotation, horizontal displacement
+- **Physics simulation** — Directional gravity, force, angle, rotation, horizontal displacement
+- **Configurable gravity** — Control gravity strength and direction to create falling confetti, rain, rising bubbles, wind effects, and more
 - **Flexible particle shapes** — Circles, images with tinting, custom paths
-- **Configurable easing** — Per-particle easing curves for position, scale, and alpha
+- **Configurable easing** — Per-particle easing curves for scale and alpha
 - **Blend modes** — Additive, screen, and other blend effects for glowing particles
 - **Multi-emitter orchestration** — Sequential or overlapping emitters with `MultiEmitter`
 - **Emitter source shapes** — Point, oval, rectangle, vertical/horizontal lines
@@ -20,7 +21,7 @@ Add the dependency to your module's `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation "io.github.piotrprus:particle-emitter:1.0.1"
+    implementation "io.github.piotrprus:particle-emitter:1.0.2"
 }
 ```
 
@@ -28,7 +29,7 @@ or with Kotlin DSL:
 
 ```kotlin
 dependencies {
-    implementation("io.github.piotrprus:particle-emitter:1.0.1")
+    implementation("io.github.piotrprus:particle-emitter:1.0.2")
 }
 ```
 
@@ -67,7 +68,7 @@ CanvasParticleEmitter(
         particleSizes = listOf(DpSize(8.dp, 8.dp), DpSize(12.dp, 12.dp)),
         spread = IntRange(-90, 90),
         blendMode = BlendMode.Screen,
-        flyDistancesDp = IntRange(50, 150),
+        initialForce = IntRange(50, 150),
     )
 )
 ```
@@ -81,7 +82,8 @@ ParticlesEmitter(
         emitDurationMillis = 1000L,
         particleLifespanMillis = 2000L,
         initialForce = 80,
-        gravityMultiplier = 1f,
+        gravityStrength = 1f,
+        gravityAngle = 0, // 0 = down
         spread = IntRange(-45, 45),
     ) {
         // Any @Composable content as a particle
@@ -110,6 +112,48 @@ MultiEmitter(
 )
 ```
 
+## Gravity
+
+Both emitters support configurable directional gravity via two parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `gravityStrength` | `Float` | `0f` (Canvas) / `1f` (Compose) | Force magnitude in Dp/s². `0` = no gravity. |
+| `gravityAngle` | `Int` | `0` | Direction in degrees. `0` = down, `180` = up, `-90` = right, `90` = left. |
+
+### Examples
+
+```kotlin
+// Falling confetti — gravity pulls particles downward
+CanvasEmitterConfig(
+    gravityStrength = 120f,
+    gravityAngle = 0,       // down
+    spread = IntRange(-45, 45),
+    initialForce = IntRange(80, 160),
+    // ...
+)
+
+// Rising bubbles — gravity pulls particles upward
+CanvasEmitterConfig(
+    gravityStrength = 50f,
+    gravityAngle = 180,     // up
+    // ...
+)
+
+// Wind effect — gravity pushes particles to the right
+CanvasEmitterConfig(
+    gravityStrength = 80f,
+    gravityAngle = -90,     // right
+    // ...
+)
+```
+
+### How it works
+
+The `CanvasParticleEmitter` uses physics-based motion: each particle has an initial velocity (from `initialForce` and `spread` angle) and is continuously accelerated by the gravity vector. This produces natural parabolic arcs — particles launched upward will curve back down, particles with sideways gravity will drift horizontally.
+
+The `ParticlesEmitter` applies the same directional gravity to its kinematic equations, allowing custom composable particles to follow realistic trajectories.
+
 ## Particle Shapes
 
 ```kotlin
@@ -122,6 +166,18 @@ ParticleShape.Image(ImageBitmap.imageResource(R.drawable.star))
 // Custom path
 ParticleShape.PathShape(myCustomPath)
 ```
+
+## Sample App
+
+The sample app includes interactive demos:
+
+| Screen | Description |
+|--------|-------------|
+| **Canvas Emitter** | Star particles with birth rate slider |
+| **Confetti** | Multi-emitter confetti with emoji and glowing stars |
+| **Glow Particles** | Glowing particles with blur and color animations |
+| **Gravity** | Canvas particles with gravity on/off toggle |
+| **Gravity Point** | Draggable gravity attractor with force slider |
 
 ## Building
 
