@@ -36,6 +36,7 @@ data class CanvasParticle(
     val rotation: Int = 0,
     val targetScale: Float,
     val startScale: Float,
+    val stuck: Boolean = false,
 ) {
     val scaleAnimConfig: TargetBasedAnimation<Float, AnimationVector1D>
         get() = TargetBasedAnimation(
@@ -51,11 +52,4 @@ data class CanvasParticle(
             initialValue = 1f,
             targetValue = 0f
         )
-
-    fun positionAt(elapsedSeconds: Double): DpOffset {
-        val t = elapsedSeconds
-        val x = startPoint.x + velocityX * t.toFloat() + gravityX * (0.5f * t.toFloat() * t.toFloat())
-        val y = startPoint.y + velocityY * t.toFloat() + gravityY * (0.5f * t.toFloat() * t.toFloat())
-        return DpOffset(x, y)
-    }
 }
