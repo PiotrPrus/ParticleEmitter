@@ -38,6 +38,7 @@ import dev.piotrprus.particleemitter.sample.screen.ConfettiSample
 import dev.piotrprus.particleemitter.sample.screen.GlowSample
 import dev.piotrprus.particleemitter.sample.screen.GravityPointSample
 import dev.piotrprus.particleemitter.sample.screen.GravitySample
+import dev.piotrprus.particleemitter.sample.screen.StickyEdgesSample
 import dev.piotrprus.particleemitter.sample.ui.theme.ExtendedColors
 import dev.piotrprus.particleemitter.sample.ui.theme.ParticleEmitterTheme
 
@@ -91,6 +92,11 @@ fun SampleNavigation() {
         composable("gravity_point") {
             SampleScaffold(title = "Gravity Point", onBack = { navController.popBackStack() }) {
                 GravityPointSample()
+            }
+        }
+        composable("sticky_edges") {
+            SampleScaffold(title = "Sticky Edges", onBack = { navController.popBackStack() }) {
+                StickyEdgesSample()
             }
         }
     }
@@ -165,6 +171,12 @@ fun MainScreen(onSampleClick: (String) -> Unit) {
             title = "Gravity Point",
             description = "Drag a gravity attractor point to bend particle trajectories",
             onClick = { onSampleClick("gravity_point") }
+        )
+
+        SampleButton(
+            title = "Sticky Edges",
+            description = "Particles bounce, stick, or wrap at screen edges",
+            onClick = { onSampleClick("sticky_edges") }
         )
     }
 }

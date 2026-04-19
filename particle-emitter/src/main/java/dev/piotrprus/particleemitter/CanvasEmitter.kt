@@ -11,6 +11,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import dev.piotrprus.particleemitter.ui.draw
 import kotlinx.coroutines.Dispatchers
@@ -26,40 +29,112 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
     val lastFrameTime = remember { mutableStateOf(0L) }
     val pendingParticles = remember { mutableStateOf(0f) }
     val currentConfig by rememberUpdatedState(config)
+    val boundsWidth = remember { mutableStateOf(0.dp) }
+    val boundsHeight = remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
 
     LaunchedEffect(Unit) {
         while (true) {
             withContext(Dispatchers.IO) {
                 withFrameNanos { frameNano ->
                     val cfg = currentConfig
+
+                    val deltaSeconds: Float
                     val newParticles = if (lastFrameTime.value == 0L) {
+                        deltaSeconds = 0.016f
                         lastFrameTime.value = frameNano
                         emptyList()
                     } else {
-                        val deltaSeconds = (frameNano - lastFrameTime.value) / 1_000_000_000.0
+                        deltaSeconds = ((frameNano - lastFrameTime.value) / 1_000_000_000.0)
+                            .toFloat().coerceIn(0.001f, 0.1f)
                         lastFrameTime.value = frameNano
-                        pendingParticles.value += (cfg.particlePerSecond * deltaSeconds).toFloat()
+                        pendingParticles.value += (cfg.particlePerSecond * deltaSeconds)
                         val count = pendingParticles.value.toInt()
                         pendingParticles.value -= count
                         createParticles(cfg, count)
                     }
 
-                    itemsToAnimate.value = (itemsToAnimate.value + newParticles).mapNotNull { canvasParticle ->
-                        val playTime = frameNano - canvasParticle.startTime
-                        if (playTime > canvasParticle.lifespan.times(1_000_000L)) {
+                    val dt = deltaSeconds
+                    val w = boundsWidth.value
+                    val h = boundsHeight.value
+
+                    itemsToAnimate.value = (itemsToAnimate.value + newParticles).mapNotNull { particle ->
+                        val playTime = frameNano - particle.startTime
+                        if (playTime > particle.lifespan.times(1_000_000L)) {
                             null
                         } else {
-                            val elapsedSeconds = playTime / 1_000_000_000.0
-                            val newPosition = canvasParticle.positionAt(elapsedSeconds)
                             val newScale =
-                                canvasParticle.scaleAnimConfig.getValueFromNanos(playTimeNanos = playTime)
+                                particle.scaleAnimConfig.getValueFromNanos(playTimeNanos = playTime)
                             val newAlpha =
-                                canvasParticle.alphaAnimConfig.getValueFromNanos(playTimeNanos = playTime)
-                            canvasParticle.copy(
-                                currentPosition = newPosition,
-                                scale = newScale,
-                                alpha = newAlpha,
-                            )
+                                particle.alphaAnimConfig.getValueFromNanos(playTimeNanos = playTime)
+
+                            if (particle.stuck) {
+                                particle.copy(scale = newScale, alpha = newAlpha)
+                            } else {
+                                // Incremental velocity: v += a * dt
+                                var vx = particle.velocityX + particle.gravityX * dt
+                                var vy = particle.velocityY + particle.gravityY * dt
+
+                                // Incremental position: p += v * dt
+                                var x = particle.currentPosition.x + vx * dt
+                                var y = particle.currentPosition.y + vy * dt
+
+                                var stuck = false
+
+                                if (w > 0.dp && h > 0.dp) {
+                                    val halfW = particle.size.width / 2
+                                    val halfH = particle.size.height / 2
+                                    val minX = halfW
+                                    val maxX = w - halfW
+                                    val minY = halfH
+                                    val maxY = h - halfH
+
+                                    when (cfg.edgeBehavior) {
+                                        is EdgeBehavior.None -> { /* particles pass through */ }
+                                        is EdgeBehavior.Bounce -> {
+                                            val damping = cfg.edgeBehavior.damping
+                                            if (x < minX) {
+                                                x = minX + (minX - x)
+                                                vx = -vx * damping
+                                            } else if (x > maxX) {
+                                                x = maxX - (x - maxX)
+                                                vx = -vx * damping
+                                            }
+                                            if (y < minY) {
+                                                y = minY + (minY - y)
+                                                vy = -vy * damping
+                                            } else if (y > maxY) {
+                                                y = maxY - (y - maxY)
+                                                vy = -vy * damping
+                                            }
+                                        }
+                                        is EdgeBehavior.Stick -> {
+                                            if (x < minX || x > maxX || y < minY || y > maxY) {
+                                                x = x.coerceIn(minX, maxX)
+                                                y = y.coerceIn(minY, maxY)
+                                                vx = 0.dp
+                                                vy = 0.dp
+                                                stuck = true
+                                            }
+                                        }
+                                        is EdgeBehavior.Wrap -> {
+                                            if (x < 0.dp - halfW) x += w + particle.size.width
+                                            else if (x > w + halfW) x -= w + particle.size.width
+                                            if (y < 0.dp - halfH) y += h + particle.size.height
+                                            else if (y > h + halfH) y -= h + particle.size.height
+                                        }
+                                    }
+                                }
+
+                                particle.copy(
+                                    currentPosition = DpOffset(x, y),
+                                    velocityX = vx,
+                                    velocityY = vy,
+                                    scale = newScale,
+                                    alpha = newAlpha,
+                                    stuck = stuck,
+                                )
+                            }
                         }
                     }
                 }
@@ -70,6 +145,12 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 
     Spacer(modifier = modifier
         .fillMaxSize()
+        .onSizeChanged { size ->
+            with(density) {
+                boundsWidth.value = size.width.toDp()
+                boundsHeight.value = size.height.toDp()
+            }
+        }
         .drawBehind {
             for (canvasParticle in itemsToAnimate.value) {
                 draw(canvasParticle = canvasParticle)

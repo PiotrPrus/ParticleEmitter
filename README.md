@@ -10,6 +10,7 @@ A Jetpack Compose particle effects library for Android. Create beautiful, physic
 - **Physics simulation** — Directional gravity, force, angle, rotation, horizontal displacement
 - **Configurable gravity** — Control gravity strength and direction to create falling confetti, rain, rising bubbles, wind effects, and more
 - **Flexible particle shapes** — Circles, images with tinting, custom paths
+- **Edge behavior** — Particles can bounce, stick, or wrap at screen boundaries
 - **Configurable easing** — Per-particle easing curves for scale and alpha
 - **Blend modes** — Additive, screen, and other blend effects for glowing particles
 - **Multi-emitter orchestration** — Sequential or overlapping emitters with `MultiEmitter`
@@ -154,6 +155,39 @@ The `CanvasParticleEmitter` uses physics-based motion: each particle has an init
 
 The `ParticlesEmitter` applies the same directional gravity to its kinematic equations, allowing custom composable particles to follow realistic trajectories.
 
+## Edge Behavior
+
+The `CanvasParticleEmitter` supports configurable edge behavior — controlling what happens when particles reach the composable boundary.
+
+| Behavior | Description |
+|----------|-------------|
+| `EdgeBehavior.None` | Particles pass through edges freely (default) |
+| `EdgeBehavior.Bounce(damping)` | Particles reflect off edges. `damping` controls velocity retained per bounce (0–1, default `0.7`) |
+| `EdgeBehavior.Stick` | Particles stop at the edge and remain there for the rest of their lifespan |
+| `EdgeBehavior.Wrap` | Particles exiting one edge reappear on the opposite side |
+
+```kotlin
+// Bouncing particles with 70% energy retention
+CanvasEmitterConfig(
+    edgeBehavior = EdgeBehavior.Bounce(damping = 0.7f),
+    // ...
+)
+
+// Particles stick to edges
+CanvasEmitterConfig(
+    edgeBehavior = EdgeBehavior.Stick,
+    // ...
+)
+
+// Particles wrap around
+CanvasEmitterConfig(
+    edgeBehavior = EdgeBehavior.Wrap,
+    // ...
+)
+```
+
+Edge collision accounts for particle size — the visual edge of the particle touches the boundary, not the center.
+
 ## Particle Shapes
 
 ```kotlin
@@ -176,10 +210,10 @@ The sample app includes interactive demos:
 | ![Canvas Emitter](media/canvas_emitter.gif) | ![Confetti](media/confetti.gif) | ![Glow Particles](media/glow.gif) |
 | Star particles with birth rate slider | Multi-emitter confetti with emoji and glowing stars | Glowing particles with blur and color animations |
 
-| Gravity | Gravity Point |
-|:-:|:-:|
-| ![Gravity](media/gravity.gif) | ![Gravity Point](media/gravity_point.gif) |
-| Canvas particles with gravity on/off toggle | Draggable gravity attractor with force slider |
+| Gravity | Gravity Point | Sticky Edges |
+|:-:|:-:|:-:|
+| ![Gravity](media/gravity.gif) | ![Gravity Point](media/gravity_point.gif) | ![Sticky Edges](media/edgeBehavior.gif) |
+| Canvas particles with gravity on/off toggle | Draggable gravity attractor with force slider | Particles bounce, stick, or wrap at edges |
 
 ## Building
 
