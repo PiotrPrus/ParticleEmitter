@@ -22,7 +22,7 @@ Add the dependency to your module's `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation "io.github.piotrprus:particle-emitter:1.0.2"
+    implementation "io.github.piotrprus:particle-emitter:1.0.3"
 }
 ```
 
@@ -30,7 +30,7 @@ or with Kotlin DSL:
 
 ```kotlin
 dependencies {
-    implementation("io.github.piotrprus:particle-emitter:1.0.2")
+    implementation("io.github.piotrprus:particle-emitter:1.0.3")
 }
 ```
 
