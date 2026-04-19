@@ -52,7 +52,7 @@ fun StickyEdgesSample() {
         CanvasParticleEmitter(
             modifier = Modifier.fillMaxSize(),
             CanvasEmitterConfig(
-                particlePerSecond = 40,
+                particlePerSecond = 10,
                 emitterCenter = DpOffset(200.dp, 200.dp),
                 startRegionShape = CanvasEmitterConfig.Shape.POINT,
                 startRegionSize = DpSize.Zero,
@@ -60,7 +60,7 @@ fun StickyEdgesSample() {
                     ParticleShape.Circle,
                     ParticleShape.Image(imageBitmap)
                 ),
-                lifespanRange = IntRange(4000, 6000),
+                lifespanRange = IntRange(8000, 12000),
                 colors = listOf(
                     Color(0xffFF6B6B), Color(0xffFFE66D), Color(0xff4ECDC4),
                     Color(0xff45B7D1), Color(0xffFF9A56)
@@ -69,7 +69,7 @@ fun StickyEdgesSample() {
                 particleSizes = listOf(DpSize(8.dp, 8.dp), DpSize(12.dp, 12.dp)),
                 initialForce = IntRange(80, 160),
                 spread = IntRange(-45, 45),
-                fadeOutTime = IntRange(3000, 5000),
+                fadeOutTime = IntRange(7000, 11000),
                 rotationRange = IntRange(-180, 180),
                 scaleTime = IntRange(500, 1000),
                 targetScaleRange = IntRange(0, 1),
