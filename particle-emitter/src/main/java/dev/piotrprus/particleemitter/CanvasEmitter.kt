@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import dev.piotrprus.particleemitter.ui.draw
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.UUID
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -174,7 +173,6 @@ private fun createParticles(
         val vy = (-force * cos(radians).toFloat()).dp
 
         CanvasParticle(
-            id = UUID.randomUUID().toString(),
             shape = config.particleShapes.random(),
             color = config.colors.random(),
             startPoint = config.startPoint,

@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 data class CanvasParticle(
-    val id: String,
     val shape: ParticleShape,
     val color: Color,
     val startPoint: DpOffset,
@@ -37,19 +36,16 @@ data class CanvasParticle(
     val targetScale: Float,
     val startScale: Float,
     val stuck: Boolean = false,
-) {
-    val scaleAnimConfig: TargetBasedAnimation<Float, AnimationVector1D>
-        get() = TargetBasedAnimation(
-            animationSpec = tween(durationMillis = scaleDuration, easing = scaleEasing),
-            typeConverter = Float.VectorConverter,
-            initialValue = startScale,
-            targetValue = targetScale
-        )
-    val alphaAnimConfig: TargetBasedAnimation<Float, AnimationVector1D>
-        get() = TargetBasedAnimation(
-            animationSpec = tween(durationMillis = fadeOutDuration, easing = alphaEasing),
-            typeConverter = Float.VectorConverter,
-            initialValue = 1f,
-            targetValue = 0f
-        )
-}
+    val scaleAnimConfig: TargetBasedAnimation<Float, AnimationVector1D> = TargetBasedAnimation(
+        animationSpec = tween(durationMillis = scaleDuration, easing = scaleEasing),
+        typeConverter = Float.VectorConverter,
+        initialValue = startScale,
+        targetValue = targetScale,
+    ),
+    val alphaAnimConfig: TargetBasedAnimation<Float, AnimationVector1D> = TargetBasedAnimation(
+        animationSpec = tween(durationMillis = fadeOutDuration, easing = alphaEasing),
+        typeConverter = Float.VectorConverter,
+        initialValue = 1f,
+        targetValue = 0f,
+    ),
+)
