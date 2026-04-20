@@ -11,6 +11,7 @@ import dev.piotrprus.particleemitter.ParticleShape
 fun DrawScope.draw(
     canvasParticle: CanvasParticle
 ) {
+    if (canvasParticle.alpha <= 0.01f || canvasParticle.scale <= 0.01f) return
     when (canvasParticle.shape) {
         ParticleShape.Circle -> {
             val centerX = canvasParticle.currentPosition.x.toPx()
