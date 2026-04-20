@@ -16,6 +16,10 @@ A Jetpack Compose particle effects library for Android. Create beautiful, physic
 - **Multi-emitter orchestration** — Sequential or overlapping emitters with `MultiEmitter`
 - **Emitter source shapes** — Point, oval, rectangle, vertical/horizontal lines
 
+## Performance
+
+See [PERFORMANCE.md](PERFORMANCE.md) for measured particle-count budgets per target frame rate (30 / 60 / 120 FPS), benchmark methodology, and sizing guidance for `CanvasParticleEmitter` on real hardware.
+
 ## Installation
 
 Add the dependency to your module's `build.gradle`:
