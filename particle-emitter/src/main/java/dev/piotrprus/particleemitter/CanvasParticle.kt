@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 data class CanvasParticle(
-    val id: String,
     val shape: ParticleShape,
     val color: Color,
     val startPoint: DpOffset,
