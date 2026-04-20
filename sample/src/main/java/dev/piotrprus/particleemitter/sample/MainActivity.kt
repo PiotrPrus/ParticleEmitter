@@ -39,6 +39,7 @@ import dev.piotrprus.particleemitter.sample.screen.ConfettiSample
 import dev.piotrprus.particleemitter.sample.screen.GlowSample
 import dev.piotrprus.particleemitter.sample.screen.GravityPointSample
 import dev.piotrprus.particleemitter.sample.screen.GravitySample
+import dev.piotrprus.particleemitter.sample.screen.SingleEmitterBenchmarkSample
 import dev.piotrprus.particleemitter.sample.screen.StickyEdgesSample
 import dev.piotrprus.particleemitter.sample.ui.theme.ExtendedColors
 import dev.piotrprus.particleemitter.sample.ui.theme.ParticleEmitterTheme
@@ -103,6 +104,11 @@ fun SampleNavigation() {
         composable("benchmark") {
             SampleScaffold(title = "Benchmark", onBack = { navController.popBackStack() }) {
                 BenchmarkSample()
+            }
+        }
+        composable("single_benchmark") {
+            SampleScaffold(title = "Single Emitter Benchmark", onBack = { navController.popBackStack() }) {
+                SingleEmitterBenchmarkSample()
             }
         }
     }
@@ -189,6 +195,12 @@ fun MainScreen(onSampleClick: (String) -> Unit) {
             title = "Benchmark",
             description = "10 emitters × 1000 particles/sec — toggle active count for profiling",
             onClick = { onSampleClick("benchmark") }
+        )
+
+        SampleButton(
+            title = "Single Emitter Benchmark",
+            description = "1 emitter, slider from 0 to 10,000 particles/sec in 1,000 steps",
+            onClick = { onSampleClick("single_benchmark") }
         )
     }
 }
