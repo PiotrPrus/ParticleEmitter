@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.piotrprus.particleemitter.sample.screen.BenchmarkSample
 import dev.piotrprus.particleemitter.sample.screen.CanvasSample
 import dev.piotrprus.particleemitter.sample.screen.ConfettiSample
 import dev.piotrprus.particleemitter.sample.screen.GlowSample
@@ -97,6 +98,11 @@ fun SampleNavigation() {
         composable("sticky_edges") {
             SampleScaffold(title = "Sticky Edges", onBack = { navController.popBackStack() }) {
                 StickyEdgesSample()
+            }
+        }
+        composable("benchmark") {
+            SampleScaffold(title = "Benchmark", onBack = { navController.popBackStack() }) {
+                BenchmarkSample()
             }
         }
     }
@@ -177,6 +183,12 @@ fun MainScreen(onSampleClick: (String) -> Unit) {
             title = "Sticky Edges",
             description = "Particles bounce, stick, or wrap at screen edges",
             onClick = { onSampleClick("sticky_edges") }
+        )
+
+        SampleButton(
+            title = "Benchmark",
+            description = "10 emitters × 1000 particles/sec — toggle active count for profiling",
+            onClick = { onSampleClick("benchmark") }
         )
     }
 }
