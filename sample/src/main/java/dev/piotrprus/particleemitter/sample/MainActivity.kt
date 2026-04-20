@@ -7,12 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -145,63 +146,70 @@ fun SampleScaffold(title: String, onBack: (() -> Unit)? = null, content: @Compos
     }
 }
 
+private data class SampleEntry(
+    val route: String,
+    val title: String,
+    val description: String,
+)
+
+private val sampleEntries = listOf(
+    SampleEntry(
+        route = "canvas",
+        title = "Canvas Emitter",
+        description = "High-performance canvas-based particles with layered star effects",
+    ),
+    SampleEntry(
+        route = "confetti",
+        title = "Confetti",
+        description = "Multi-emitter confetti with emoji and glowing stars",
+    ),
+    SampleEntry(
+        route = "glow",
+        title = "Glow Particles",
+        description = "Glowing particles with blur and color animations",
+    ),
+    SampleEntry(
+        route = "gravity",
+        title = "Gravity",
+        description = "Canvas particles with configurable gravity — toggle on/off",
+    ),
+    SampleEntry(
+        route = "gravity_point",
+        title = "Gravity Point",
+        description = "Drag a gravity attractor point to bend particle trajectories",
+    ),
+    SampleEntry(
+        route = "sticky_edges",
+        title = "Sticky Edges",
+        description = "Particles bounce, stick, or wrap at screen edges",
+    ),
+    SampleEntry(
+        route = "benchmark",
+        title = "Benchmark",
+        description = "10 emitters × 1000 particles/sec — toggle active count for profiling",
+    ),
+    SampleEntry(
+        route = "single_benchmark",
+        title = "Single Emitter Benchmark",
+        description = "1 emitter, slider from 0 to 10,000 particles/sec in 1,000 steps",
+    ),
+)
+
 @Composable
 fun MainScreen(onSampleClick: (String) -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        SampleButton(
-            title = "Canvas Emitter",
-            description = "High-performance canvas-based particles with layered star effects",
-            onClick = { onSampleClick("canvas") }
-        )
-
-        SampleButton(
-            title = "Confetti",
-            description = "Multi-emitter confetti with emoji and glowing stars",
-            onClick = { onSampleClick("confetti") }
-        )
-
-        SampleButton(
-            title = "Glow Particles",
-            description = "Glowing particles with blur and color animations",
-            onClick = { onSampleClick("glow") }
-        )
-
-        SampleButton(
-            title = "Gravity",
-            description = "Canvas particles with configurable gravity — toggle on/off",
-            onClick = { onSampleClick("gravity") }
-        )
-
-        SampleButton(
-            title = "Gravity Point",
-            description = "Drag a gravity attractor point to bend particle trajectories",
-            onClick = { onSampleClick("gravity_point") }
-        )
-
-        SampleButton(
-            title = "Sticky Edges",
-            description = "Particles bounce, stick, or wrap at screen edges",
-            onClick = { onSampleClick("sticky_edges") }
-        )
-
-        SampleButton(
-            title = "Benchmark",
-            description = "10 emitters × 1000 particles/sec — toggle active count for profiling",
-            onClick = { onSampleClick("benchmark") }
-        )
-
-        SampleButton(
-            title = "Single Emitter Benchmark",
-            description = "1 emitter, slider from 0 to 10,000 particles/sec in 1,000 steps",
-            onClick = { onSampleClick("single_benchmark") }
-        )
+        items(sampleEntries, key = { it.route }) { entry ->
+            SampleButton(
+                title = entry.title,
+                description = entry.description,
+                onClick = { onSampleClick(entry.route) },
+            )
+        }
     }
 }
 
