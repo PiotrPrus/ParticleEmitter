@@ -203,6 +203,13 @@ ParticleShape.Image(ImageBitmap.imageResource(R.drawable.star))
 
 // Custom path
 ParticleShape.PathShape(myCustomPath)
+
+// Text (emoji or regular text) — requires a TextMeasurer
+ParticleShape.Text(
+    text = "🎉",
+    textStyle = TextStyle(fontSize = 20.sp),
+    textMeasurer = rememberTextMeasurer(),
+)
 ```
 
 ## Sample App
@@ -219,10 +226,10 @@ The sample app includes interactive demos:
 | ![Gravity](media/gravity.gif) | ![Gravity Point](media/gravity_point.gif) | ![Sticky Edges](media/edgeBehavior.gif) |
 | Canvas particles with gravity on/off toggle | Draggable gravity attractor with force slider | Particles bounce, stick, or wrap at edges |
 
-| Magic Wand |
-|:-:|
-| ![Magic Wand](media/magic_wand.gif) |
-| Drag a wand to leave a sparkling trail of stars |
+| Magic Wand | Emoji Rain |
+|:-:|:-:|
+| ![Magic Wand](media/magic_wand.gif) | ![Emoji Rain](media/emoji_rain.gif) |
+| Drag a wand to leave a sparkling trail of stars | Fullscreen emoji particles using the Text shape |
 
 ## Building
 
