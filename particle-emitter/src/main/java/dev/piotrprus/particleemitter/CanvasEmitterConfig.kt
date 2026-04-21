@@ -35,6 +35,7 @@ import kotlin.math.sin
  * @param gravityStrength - strength of gravitational force applied to particles in Dp/s². A value of 0 means no gravity. Higher values create stronger pull.
  * @param gravityAngle - direction of gravity in degrees. 0 degrees points downward (bottom of the screen), 90 degrees points left, -90 degrees points right, 180 degrees points upward.
  * @param edgeBehavior - defines how particles behave when they reach the composable boundary. See [EdgeBehavior] for options: [EdgeBehavior.None] (default), [EdgeBehavior.Bounce], [EdgeBehavior.Stick], [EdgeBehavior.Wrap].
+ * @param emitDurationMillis - total duration in milliseconds during which the emitter will keep spawning particles at [particlePerSecond]. Measured from the first frame the emitter runs. When `null` (default) the emitter emits indefinitely. When non-null, emission stops after the duration elapses and `onLastParticleEmitted` on [CanvasParticleEmitter] is invoked once.
  *
  */
 
@@ -60,6 +61,7 @@ data class CanvasEmitterConfig(
     val gravityStrength: Float = 0f,
     val gravityAngle: Int = 0,
     val edgeBehavior: EdgeBehavior = EdgeBehavior.None,
+    val emitDurationMillis: Int? = null,
 ) {
     val startPoint: DpOffset
         get() = when (startRegionShape) {
