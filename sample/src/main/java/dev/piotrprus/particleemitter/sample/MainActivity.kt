@@ -40,6 +40,7 @@ import dev.piotrprus.particleemitter.sample.screen.ConfettiSample
 import dev.piotrprus.particleemitter.sample.screen.GlowSample
 import dev.piotrprus.particleemitter.sample.screen.GravityPointSample
 import dev.piotrprus.particleemitter.sample.screen.GravitySample
+import dev.piotrprus.particleemitter.sample.screen.MagicWandSample
 import dev.piotrprus.particleemitter.sample.screen.SingleEmitterBenchmarkSample
 import dev.piotrprus.particleemitter.sample.screen.StickyEdgesSample
 import dev.piotrprus.particleemitter.sample.ui.theme.ExtendedColors
@@ -95,6 +96,11 @@ fun SampleNavigation() {
         composable("gravity_point") {
             SampleScaffold(title = "Gravity Point", onBack = { navController.popBackStack() }) {
                 GravityPointSample()
+            }
+        }
+        composable("magic_wand") {
+            SampleScaffold(title = "Magic Wand", onBack = { navController.popBackStack() }) {
+                MagicWandSample()
             }
         }
         composable("sticky_edges") {
@@ -177,6 +183,11 @@ private val sampleEntries = listOf(
         route = "gravity_point",
         title = "Gravity Point",
         description = "Drag a gravity attractor point to bend particle trajectories",
+    ),
+    SampleEntry(
+        route = "magic_wand",
+        title = "Magic Wand",
+        description = "Drag to leave a sparkling trail of stars",
     ),
     SampleEntry(
         route = "sticky_edges",
