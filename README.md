@@ -219,6 +219,11 @@ The sample app includes interactive demos:
 | ![Gravity](media/gravity.gif) | ![Gravity Point](media/gravity_point.gif) | ![Sticky Edges](media/edgeBehavior.gif) |
 | Canvas particles with gravity on/off toggle | Draggable gravity attractor with force slider | Particles bounce, stick, or wrap at edges |
 
+| Magic Wand |
+|:-:|
+| ![Magic Wand](media/magic_wand.gif) |
+| Drag a wand to leave a sparkling trail of stars |
+
 ## Building
 
 ```bash
