@@ -151,7 +151,10 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
             }
         }
         .drawBehind {
+            val cfg = currentConfig
+            val hideInside = cfg.hideInStartRegion
             for (canvasParticle in itemsToAnimate.value) {
+                if (hideInside && cfg.isInsideStartRegion(canvasParticle.currentPosition)) continue
                 draw(canvasParticle = canvasParticle)
             }
         })

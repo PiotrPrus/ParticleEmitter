@@ -42,6 +42,7 @@ import dev.piotrprus.particleemitter.sample.screen.GlowSample
 import dev.piotrprus.particleemitter.sample.screen.GravityPointSample
 import dev.piotrprus.particleemitter.sample.screen.GravitySample
 import dev.piotrprus.particleemitter.sample.screen.MagicWandSample
+import dev.piotrprus.particleemitter.sample.screen.RingEmitterSample
 import dev.piotrprus.particleemitter.sample.screen.SingleEmitterBenchmarkSample
 import dev.piotrprus.particleemitter.sample.screen.StickyEdgesSample
 import dev.piotrprus.particleemitter.sample.ui.theme.ExtendedColors
@@ -107,6 +108,11 @@ fun SampleNavigation() {
         composable("emoji_rain") {
             SampleScaffold(title = "Emoji Rain", onBack = { navController.popBackStack() }) {
                 EmojiRainSample()
+            }
+        }
+        composable("ring_emitter") {
+            SampleScaffold(title = "Ring Emitter", onBack = { navController.popBackStack() }) {
+                RingEmitterSample()
             }
         }
         composable("sticky_edges") {
@@ -199,6 +205,11 @@ private val sampleEntries = listOf(
         route = "emoji_rain",
         title = "Emoji Rain",
         description = "Fullscreen emoji particles using the Text shape",
+    ),
+    SampleEntry(
+        route = "ring_emitter",
+        title = "Ring Emitter",
+        description = "Ring start region with 360° spread — toggle hideInStartRegion",
     ),
     SampleEntry(
         route = "sticky_edges",
