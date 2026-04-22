@@ -37,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import dev.piotrprus.particleemitter.sample.screen.BenchmarkSample
 import dev.piotrprus.particleemitter.sample.screen.CanvasSample
 import dev.piotrprus.particleemitter.sample.screen.ConfettiSample
+import dev.piotrprus.particleemitter.sample.screen.EmojiRainSample
 import dev.piotrprus.particleemitter.sample.screen.GlowSample
 import dev.piotrprus.particleemitter.sample.screen.GravityPointSample
 import dev.piotrprus.particleemitter.sample.screen.GravitySample
@@ -101,6 +102,11 @@ fun SampleNavigation() {
         composable("magic_wand") {
             SampleScaffold(title = "Magic Wand", onBack = { navController.popBackStack() }) {
                 MagicWandSample()
+            }
+        }
+        composable("emoji_rain") {
+            SampleScaffold(title = "Emoji Rain", onBack = { navController.popBackStack() }) {
+                EmojiRainSample()
             }
         }
         composable("sticky_edges") {
@@ -188,6 +194,11 @@ private val sampleEntries = listOf(
         route = "magic_wand",
         title = "Magic Wand",
         description = "Drag to leave a sparkling trail of stars",
+    ),
+    SampleEntry(
+        route = "emoji_rain",
+        title = "Emoji Rain",
+        description = "Fullscreen emoji particles using the Text shape",
     ),
     SampleEntry(
         route = "sticky_edges",
