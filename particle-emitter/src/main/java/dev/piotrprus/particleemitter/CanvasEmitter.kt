@@ -22,19 +22,12 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun CanvasParticleEmitter(
-    modifier: Modifier,
-    config: CanvasEmitterConfig,
-    onLastParticleEmitted: () -> Unit = {},
-) {
+fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 
     val itemsToAnimate = remember { mutableStateOf<List<CanvasParticle>>(emptyList()) }
     val lastFrameTime = remember { mutableStateOf(0L) }
     val pendingParticles = remember { mutableStateOf(0f) }
-    val emitterStartTime = remember { mutableStateOf(0L) }
-    val emissionEnded = remember { mutableStateOf(false) }
     val currentConfig by rememberUpdatedState(config)
-    val currentOnLastParticleEmitted by rememberUpdatedState(onLastParticleEmitted)
     val boundsWidth = remember { mutableStateOf(0.dp) }
     val boundsHeight = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
@@ -49,27 +42,15 @@ fun CanvasParticleEmitter(
                     val newParticles = if (lastFrameTime.value == 0L) {
                         deltaSeconds = 0.016f
                         lastFrameTime.value = frameNano
-                        emitterStartTime.value = frameNano
                         emptyList()
                     } else {
                         deltaSeconds = ((frameNano - lastFrameTime.value) / 1_000_000_000.0)
                             .toFloat().coerceIn(0.001f, 0.1f)
                         lastFrameTime.value = frameNano
-
-                        val duration = cfg.emitDurationMillis
-                        val elapsedMs = (frameNano - emitterStartTime.value) / 1_000_000L
-                        if (duration != null && !emissionEnded.value && elapsedMs >= duration) {
-                            emissionEnded.value = true
-                            currentOnLastParticleEmitted()
-                            emptyList()
-                        } else if (emissionEnded.value) {
-                            emptyList()
-                        } else {
-                            pendingParticles.value += (cfg.particlePerSecond * deltaSeconds)
-                            val count = pendingParticles.value.toInt()
-                            pendingParticles.value -= count
-                            createParticles(cfg, count)
-                        }
+                        pendingParticles.value += (cfg.particlePerSecond * deltaSeconds)
+                        val count = pendingParticles.value.toInt()
+                        pendingParticles.value -= count
+                        createParticles(cfg, count)
                     }
 
                     val dt = deltaSeconds
