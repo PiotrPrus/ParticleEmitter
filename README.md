@@ -26,7 +26,7 @@ Add the dependency to your module's `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation "io.github.piotrprus:particle-emitter:1.0.4"
+    implementation "io.github.piotrprus:particle-emitter:1.0.5"
 }
 ```
 
@@ -34,7 +34,7 @@ or with Kotlin DSL:
 
 ```kotlin
 dependencies {
-    implementation("io.github.piotrprus:particle-emitter:1.0.4")
+    implementation("io.github.piotrprus:particle-emitter:1.0.5")
 }
 ```
 
