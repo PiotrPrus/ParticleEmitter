@@ -1,16 +1,26 @@
 package dev.piotrprus.particleemitter.sample.screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,9 +39,14 @@ import androidx.compose.ui.unit.sp
 import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.ParticleShape
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 private val EmojiSet = listOf("\uD83C\uDF81", "\uD83C\uDF89", "\uD83E\uDD73", "\uD83C\uDF8A")
+
+private const val BurstRate = 80
+private const val BurstDurationMs = 3_000L
+private const val RainEndedVisibleMs = 2_000L
 
 @Composable
 fun EmojiRainSample() {
@@ -39,7 +54,22 @@ fun EmojiRainSample() {
     val textMeasurer = rememberTextMeasurer()
 
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
-    var rate by remember { mutableFloatStateOf(30f) }
+    var sliderRate by remember { mutableFloatStateOf(30f) }
+    var burstTrigger by remember { mutableIntStateOf(0) }
+    var isBursting by remember { mutableStateOf(false) }
+    var showRainEnded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(burstTrigger) {
+        if (burstTrigger == 0) return@LaunchedEffect
+        isBursting = true
+        delay(BurstDurationMs)
+        isBursting = false
+        showRainEnded = true
+        delay(RainEndedVisibleMs)
+        showRainEnded = false
+    }
+
+    val rate = if (isBursting) BurstRate else sliderRate.roundToInt()
 
     val emojiShapes = remember(textMeasurer) {
         EmojiSet.map { emoji ->
@@ -61,7 +91,7 @@ fun EmojiRainSample() {
             CanvasParticleEmitter(
                 modifier = Modifier.fillMaxSize(),
                 config = CanvasEmitterConfig(
-                    particlePerSecond = rate.roundToInt(),
+                    particlePerSecond = rate,
                     emitterCenter = DpOffset(widthDp / 2, 0.dp),
                     startRegionShape = CanvasEmitterConfig.Shape.H_LINE,
                     startRegionSize = DpSize(widthDp, 20.dp),
@@ -82,6 +112,21 @@ fun EmojiRainSample() {
             )
         }
 
+        AnimatedVisibility(
+            visible = showRainEnded,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 32.dp),
+        ) {
+            Text(
+                text = "Rain ended",
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -89,16 +134,29 @@ fun EmojiRainSample() {
                 .padding(horizontal = 24.dp, vertical = 24.dp),
         ) {
             Text(
-                text = "Particles/sec: ${rate.roundToInt()}",
+                text = if (isBursting) "Bursting: $BurstRate/s" else "Particles/sec: ${sliderRate.roundToInt()}",
                 color = Color.White,
                 style = MaterialTheme.typography.bodyMedium,
             )
             Slider(
-                value = rate,
-                onValueChange = { rate = it },
-                valueRange = 1f..80f,
+                value = sliderRate,
+                onValueChange = { sliderRate = it },
+                valueRange = 0f..80f,
+                enabled = !isBursting,
                 modifier = Modifier.fillMaxWidth(),
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Button(
+                    onClick = { burstTrigger++ },
+                    enabled = !isBursting,
+                ) {
+                    Text(text = "Burst 3s")
+                }
+            }
         }
     }
 }

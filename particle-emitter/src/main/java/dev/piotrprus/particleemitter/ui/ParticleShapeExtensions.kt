@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.toSize
 import dev.piotrprus.particleemitter.CanvasParticle
 import dev.piotrprus.particleemitter.ParticleShape
@@ -96,8 +95,9 @@ fun DrawScope.draw(
         is ParticleShape.Text -> {
             val centerX = canvasParticle.currentPosition.x.toPx()
             val centerY = canvasParticle.currentPosition.y.toPx()
-            val layoutResult = canvasParticle.shape.layoutResult
-            val textSize = layoutResult.size.toSize()
+            val bitmap = canvasParticle.shape.bitmap
+            val halfW = bitmap.width / 2f
+            val halfH = bitmap.height / 2f
             withTransform({
                 scale(
                     scaleX = canvasParticle.scale,
@@ -108,14 +108,13 @@ fun DrawScope.draw(
                     degrees = canvasParticle.rotation * canvasParticle.scale,
                     Offset(centerX, centerY)
                 )
-                translate(left = centerX, top = centerY)
+                translate(left = centerX - halfW, top = centerY - halfH)
             }) {
-                drawText(
-                    textLayoutResult = layoutResult,
-                    color = canvasParticle.color,
-                    topLeft = Offset(-textSize.width / 2f, -textSize.height / 2f),
-                    alpha = canvasParticle.alpha,
+                drawImage(
+                    image = bitmap,
                     blendMode = canvasParticle.blendMode,
+                    alpha = canvasParticle.alpha,
+                    filterQuality = FilterQuality.Low,
                 )
             }
         }
