@@ -192,6 +192,27 @@ CanvasEmitterConfig(
 
 Edge collision accounts for particle size — the visual edge of the particle touches the boundary, not the center.
 
+## Hide In Start Region
+
+With a ring-shaped emitter (`Shape.OVAL`) and a 360° spread, roughly half the particles travel *through* the interior of the ring, cluttering the center. Set `hideInStartRegion = true` to skip drawing any particle whose current position is inside the start region — particles that leave the region become visible again on the far side.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `hideInStartRegion` | `Boolean` | `false` | When `true`, particles currently inside the `startRegionShape` + `startRegionSize` bounds are not drawn. Applies to `OVAL` and `RECT` regions. `POINT`, `H_LINE`, and `V_LINE` have no interior and the flag is a no-op. |
+
+```kotlin
+// Ring emitter that keeps its interior clean
+CanvasEmitterConfig(
+    startRegionShape = CanvasEmitterConfig.Shape.OVAL,
+    startRegionSize = DpSize(180.dp, 180.dp),
+    spread = IntRange(0, 360),
+    hideInStartRegion = true,
+    // ...
+)
+```
+
+Particles still exist and move through the region (physics is untouched); they're just invisible while their position falls inside.
+
 ## Particle Shapes
 
 ```kotlin

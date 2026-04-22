@@ -35,6 +35,7 @@ import kotlin.math.sin
  * @param gravityStrength - strength of gravitational force applied to particles in Dp/s². A value of 0 means no gravity. Higher values create stronger pull.
  * @param gravityAngle - direction of gravity in degrees. 0 degrees points downward (bottom of the screen), 90 degrees points left, -90 degrees points right, 180 degrees points upward.
  * @param edgeBehavior - defines how particles behave when they reach the composable boundary. See [EdgeBehavior] for options: [EdgeBehavior.None] (default), [EdgeBehavior.Bounce], [EdgeBehavior.Stick], [EdgeBehavior.Wrap].
+ * @param hideInStartRegion - when `true`, particles whose current position falls inside the start region (as defined by [startRegionShape] and [startRegionSize]) are not drawn. Useful for ring emitters with 360° spread where particles crossing the interior would otherwise clutter the center. Default is `false`.
  *
  */
 
@@ -60,7 +61,30 @@ data class CanvasEmitterConfig(
     val gravityStrength: Float = 0f,
     val gravityAngle: Int = 0,
     val edgeBehavior: EdgeBehavior = EdgeBehavior.None,
+    val hideInStartRegion: Boolean = false,
 ) {
+    fun isInsideStartRegion(pos: DpOffset): Boolean {
+        val dx = (pos.x - emitterCenter.x).value
+        val dy = (pos.y - emitterCenter.y).value
+        return when (startRegionShape) {
+            Shape.POINT -> false
+            Shape.OVAL -> {
+                val rx = startRegionSize.width.value / 2f
+                val ry = startRegionSize.height.value / 2f
+                if (rx <= 0f || ry <= 0f) return false
+                val nx = dx / rx
+                val ny = dy / ry
+                nx * nx + ny * ny < 1f
+            }
+            Shape.RECT -> {
+                val halfW = startRegionSize.width.value / 2f
+                val halfH = startRegionSize.height.value / 2f
+                kotlin.math.abs(dx) < halfW && kotlin.math.abs(dy) < halfH
+            }
+            Shape.H_LINE, Shape.V_LINE -> false
+        }
+    }
+
     val startPoint: DpOffset
         get() = when (startRegionShape) {
             Shape.OVAL -> getRandomOffsetOnCircle(emitterCenter, startRegionSize)
