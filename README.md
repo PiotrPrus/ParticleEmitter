@@ -6,12 +6,11 @@ A Jetpack Compose particle effects library for Android. Create beautiful, physic
 
 - **Two rendering engines:**
   - `ParticlesEmitter` — Compose layout-based, supports custom `@Composable` particles (text, images, shapes)
-  - `CanvasParticleEmitter` — Canvas-based, high-performance rendering for 100+ particles
-- **Physics simulation** — Directional gravity, force, angle, rotation, horizontal displacement
+  - `CanvasParticleEmitter` — Canvas-based, high-performance rendering for 1 000+ particles
+- **Physics simulation** — Directional gravity, force, angle, rotation
 - **Configurable gravity** — Control gravity strength and direction to create falling confetti, rain, rising bubbles, wind effects, and more
-- **Flexible particle shapes** — Circles, images with tinting, custom paths
+- **Flexible particle shapes** — Circles, images with tinting, text, custom paths
 - **Edge behavior** — Particles can bounce, stick, or wrap at screen boundaries
-- **Configurable easing** — Per-particle easing curves for scale and alpha
 - **Blend modes** — Additive, screen, and other blend effects for glowing particles
 - **Multi-emitter orchestration** — Sequential or overlapping emitters with `MultiEmitter`
 - **Emitter source shapes** — Point, oval, rectangle, vertical/horizontal lines
@@ -194,7 +193,7 @@ Edge collision accounts for particle size — the visual edge of the particle to
 
 ## Hide In Start Region
 
-With a ring-shaped emitter (`Shape.OVAL`) and a 360° spread, roughly half the particles travel *through* the interior of the ring, cluttering the center. Set `hideInStartRegion = true` to skip drawing any particle whose current position is inside the start region — particles that leave the region become visible again on the far side.
+With a ring-shaped emitter (`Shape.OVAL`) and a 360° spread, some of the particles travel *through* the interior of the ring, cluttering the center. Set `hideInStartRegion = true` to skip drawing any particle whose current position is inside the start region — particles that leave the region become visible again on the far side.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -251,16 +250,6 @@ The sample app includes interactive demos:
 |:-:|:-:|
 | ![Magic Wand](media/magic_wand.gif) | ![Emoji Rain](media/emoji_rain.gif) |
 | Drag a wand to leave a sparkling trail of stars | Fullscreen emoji particles using the Text shape |
-
-## Building
-
-```bash
-# Build library
-./gradlew :particle-emitter:assembleRelease
-
-# Run sample app
-./gradlew :sample:installDebug
-```
 
 ## License
 
