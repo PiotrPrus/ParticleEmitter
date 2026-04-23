@@ -18,9 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -28,16 +25,16 @@ import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.EdgeBehavior
 import dev.piotrprus.particleemitter.ParticleShape
-import dev.piotrprus.particleemitter.sample.R
+import particleemitter.samples.shared.generated.resources.Res
+import particleemitter.samples.shared.generated.resources.star_four
+import org.jetbrains.compose.resources.imageResource
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 
 @Composable
 fun StickyEdgesSample() {
-    val context = LocalContext.current
-    val imageBitmap =
-        remember { ImageBitmap.imageResource(context.resources, R.drawable.star_four) }
+    val imageBitmap = imageResource(Res.drawable.star_four)
 
     var selectedBehavior by remember { mutableStateOf<EdgeBehavior>(EdgeBehavior.Bounce()) }
 

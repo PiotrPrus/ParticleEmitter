@@ -1,6 +1,7 @@
 package dev.piotrprus.particleemitter
 
 import androidx.compose.runtime.Composable
+import kotlin.math.PI
 
 data class Particle(
     val id: String,
@@ -14,8 +15,8 @@ data class Particle(
     val content: @Composable () -> Unit
 ) {
     val radiants
-        get() = Math.toRadians(angle.toDouble())
+        get() = angle.toDouble() * PI / 180.0
 
     val gravityRadians
-        get() = Math.toRadians(gravityAngle.toDouble())
+        get() = gravityAngle.toDouble() * PI / 180.0
 }

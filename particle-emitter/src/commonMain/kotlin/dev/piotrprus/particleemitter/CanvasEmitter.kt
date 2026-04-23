@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import dev.piotrprus.particleemitter.ui.draw
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -34,7 +35,7 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 
     LaunchedEffect(Unit) {
         while (true) {
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 withFrameNanos { frameNano ->
                     val cfg = currentConfig
 
@@ -50,7 +51,7 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
                         pendingParticles.value += (cfg.particlePerSecond * deltaSeconds)
                         val count = pendingParticles.value.toInt()
                         pendingParticles.value -= count
-                        createParticles(cfg, count)
+                        createParticles(cfg, count, frameNano)
                     }
 
                     val dt = deltaSeconds
@@ -164,13 +165,13 @@ private fun createParticles(
     config: CanvasEmitterConfig,
     count: Int
 ): List<CanvasParticle> {
-    val gravityRadians = Math.toRadians(config.gravityAngle.toDouble())
+    val gravityRadians = config.gravityAngle.toDouble() * PI / 180.0
     val gravityXDp = (config.gravityStrength * -sin(gravityRadians).toFloat()).dp
     val gravityYDp = (config.gravityStrength * cos(gravityRadians).toFloat()).dp
 
     return List(count) {
         val angle = config.spread.random()
-        val radians = Math.toRadians(angle.toDouble())
+        val radians = angle.toDouble() * PI / 180.0
         val force = config.initialForce.random()
         val vx = (force * sin(radians).toFloat()).dp
         val vy = (-force * cos(radians).toFloat()).dp
