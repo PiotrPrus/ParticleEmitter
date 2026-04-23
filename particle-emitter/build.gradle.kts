@@ -1,46 +1,70 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.plugin.compose'
-    id 'com.vanniktech.maven.publish'
+    id("org.jetbrains.kotlin.multiplatform")
+    id("com.android.library")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.compose")
+    id("com.vanniktech.maven.publish")
+}
+
+kotlin {
+    androidTarget {
+        publishLibraryVariants("release")
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+
+    jvm()
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    macosX64()
+    macosArm64()
+
+    js {
+        browser()
+    }
+
+    wasmJs {
+        browser()
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.ui)
+                implementation(compose.animation)
+            }
+        }
+    }
 }
 
 android {
-    namespace 'dev.piotrprus.particleemitter'
-    compileSdk 35
+    namespace = "dev.piotrprus.particleemitter"
+    compileSdk = 35
 
     defaultConfig {
-        minSdk 24
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
+        minSdk = 24
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-    buildFeatures {
-        compose true
-    }
-}
 
-dependencies {
-    implementation platform('org.jetbrains.kotlin:kotlin-bom:2.0.21')
-    implementation platform('androidx.compose:compose-bom:2024.12.01')
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.ui:ui-graphics'
-    implementation 'androidx.compose.foundation:foundation'
-    implementation 'androidx.compose.animation:animation-core'
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
 
 mavenPublishing {
@@ -50,30 +74,30 @@ mavenPublishing {
     coordinates("io.github.piotrprus", "particle-emitter", "1.0.5")
 
     pom {
-        name = "ParticleEmitter"
-        description = "Jetpack Compose particle effects library for Android. Physics-based animations with Canvas and Compose rendering engines."
-        inceptionYear = "2024"
-        url = "https://github.com/PiotrPrus/ParticleEmitter/"
+        name.set("ParticleEmitter")
+        description.set("Kotlin Multiplatform particle effects library built on Compose Multiplatform. Physics-based animations with Canvas and Compose rendering engines for Android, JVM desktop, and iOS.")
+        inceptionYear.set("2024")
+        url.set("https://github.com/PiotrPrus/ParticleEmitter/")
 
         licenses {
             license {
-                name = "The Apache License, Version 2.0"
-                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
 
         developers {
             developer {
-                id = "piotrprus"
-                name = "Piotr Prus"
-                url = "https://github.com/PiotrPrus/"
+                id.set("piotrprus")
+                name.set("Piotr Prus")
+                url.set("https://github.com/PiotrPrus/")
             }
         }
 
         scm {
-            url = "https://github.com/PiotrPrus/ParticleEmitter/"
-            connection = "scm:git:git://github.com/PiotrPrus/ParticleEmitter.git"
-            developerConnection = "scm:git:ssh://git@github.com/PiotrPrus/ParticleEmitter.git"
+            url.set("https://github.com/PiotrPrus/ParticleEmitter/")
+            connection.set("scm:git:git://github.com/PiotrPrus/ParticleEmitter.git")
+            developerConnection.set("scm:git:ssh://git@github.com/PiotrPrus/ParticleEmitter.git")
         }
     }
 }

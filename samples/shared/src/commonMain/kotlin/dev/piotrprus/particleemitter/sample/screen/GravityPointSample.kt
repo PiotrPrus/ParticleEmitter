@@ -27,12 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
@@ -41,7 +38,10 @@ import androidx.compose.ui.unit.dp
 import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.ParticleShape
-import dev.piotrprus.particleemitter.sample.R
+import particleemitter.samples.shared.generated.resources.Res
+import particleemitter.samples.shared.generated.resources.star_four
+import org.jetbrains.compose.resources.imageResource
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -49,9 +49,7 @@ import kotlin.math.sqrt
 @Composable
 fun GravityPointSample() {
     val density = LocalDensity.current
-    val context = LocalContext.current
-    val imageBitmap =
-        remember { ImageBitmap.imageResource(context.resources, R.drawable.star_four) }
+    val imageBitmap = imageResource(Res.drawable.star_four)
 
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
     var particleForce by remember { mutableStateOf(120f) }
@@ -85,7 +83,7 @@ fun GravityPointSample() {
     val dy = gravityPointPx.y - emitterPx.y
     val distancePx = sqrt(dx * dx + dy * dy)
     // atan2(-dx, dy) maps: down=0, left=90, right=-90, up=180
-    val gravityAngleDeg = Math.toDegrees(atan2(-dx.toDouble(), dy.toDouble())).toInt()
+    val gravityAngleDeg = (atan2(-dx.toDouble(), dy.toDouble()) * 180.0 / PI).toInt()
     // Scale strength by distance — farther point = stronger pull
     val maxDistance = sqrt(
         (containerSize.width * containerSize.width + containerSize.height * containerSize.height).toFloat()

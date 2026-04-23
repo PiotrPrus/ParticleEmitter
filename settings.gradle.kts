@@ -1,3 +1,5 @@
+rootProject.name = "ParticleEmitter"
+
 pluginManagement {
     repositories {
         google()
@@ -5,6 +7,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -12,8 +15,10 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "ParticleEmitter"
-include ':particle-emitter'
-include ':sample'
-include ':app'
-project(':app').projectDir = file('sample')
+
+include(":particle-emitter")
+
+include(":samples:androidApp")
+include(":samples:shared")
+include(":samples:desktopApp")
+include(":samples:webApp")

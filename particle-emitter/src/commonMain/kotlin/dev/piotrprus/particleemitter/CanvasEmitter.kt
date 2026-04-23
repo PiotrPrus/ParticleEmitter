@@ -34,7 +34,7 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 
     LaunchedEffect(Unit) {
         while (true) {
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 withFrameNanos { frameNano ->
                     val cfg = currentConfig
 

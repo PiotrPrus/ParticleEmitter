@@ -28,7 +28,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
@@ -38,15 +37,14 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.graphics.shapes.CornerRounding
-import androidx.graphics.shapes.RoundedPolygon
-import androidx.graphics.shapes.star
-import androidx.graphics.shapes.toPath
 import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.ParticleShape
 import kotlinx.coroutines.delay
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 private val WandGold = Color(0xFFFFC93C)
 private val StickBrown = Color(0xFF6B4A2B)
@@ -71,11 +69,11 @@ fun MagicWandSample() {
     var multiplier by remember { mutableFloatStateOf(5f) }
     var baseRate by remember { mutableFloatStateOf(5f) }
     var lifespan by remember { mutableFloatStateOf(700f) }
-    var lastMoveAt by remember { mutableLongStateOf(0L) }
+    var moveCounter by remember { mutableLongStateOf(0L) }
     var isMoving by remember { mutableStateOf(false) }
 
-    LaunchedEffect(lastMoveAt) {
-        if (lastMoveAt == 0L) return@LaunchedEffect
+    LaunchedEffect(moveCounter) {
+        if (moveCounter == 0L) return@LaunchedEffect
         isMoving = true
         delay(MoveDebounceMs)
         isMoving = false
@@ -155,7 +153,7 @@ fun MagicWandSample() {
                                 x = (wandPx.x + drag.x).coerceIn(0f, containerSize.width.toFloat()),
                                 y = (wandPx.y + drag.y).coerceIn(0f, containerSize.height.toFloat()),
                             )
-                            lastMoveAt = System.nanoTime()
+                            moveCounter++
                         }
                     }
             ) {
@@ -232,13 +230,19 @@ fun MagicWandSample() {
 }
 
 private fun buildStarPath(radiusPx: Float, centerOffsetPx: Float): Path {
-    val polygon = RoundedPolygon.star(
-        numVerticesPerRadius = 5,
-        radius = radiusPx,
-        innerRadius = radiusPx * 0.45f,
-        rounding = CornerRounding(radiusPx * 0.08f),
-        centerX = centerOffsetPx,
-        centerY = centerOffsetPx,
-    )
-    return polygon.toPath().asComposePath()
+    // 5-pointed star path: alternate between outer and inner radius around the circle.
+    val points = 5
+    val outer = radiusPx
+    val inner = radiusPx * 0.45f
+    val path = Path()
+    for (i in 0 until points * 2) {
+        val r = if (i % 2 == 0) outer else inner
+        // Start at the top (-PI/2), sweep clockwise.
+        val angle = -PI / 2 + i * PI / points
+        val x = centerOffsetPx + r * cos(angle).toFloat()
+        val y = centerOffsetPx + r * sin(angle).toFloat()
+        if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+    }
+    path.close()
+    return path
 }

@@ -13,7 +13,7 @@ data class Particle(
     val rotationMultiplier: Float,
     val content: @Composable () -> Unit
 ) {
-    val radiants
+    val radians
         get() = Math.toRadians(angle.toDouble())
 
     val gravityRadians
