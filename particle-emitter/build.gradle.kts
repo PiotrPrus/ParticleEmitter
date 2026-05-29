@@ -2,27 +2,35 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.compose")
     id("com.vanniktech.maven.publish")
 }
 
 kotlin {
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = "dev.piotrprus.particleemitter"
+        compileSdk = 35
+        minSdk = 24
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
+        }
+
+        optimization {
+            consumerKeepRules.apply {
+                publish = true
+                file("consumer-rules.pro")
+            }
         }
     }
 
     jvm()
 
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 
-    macosX64()
     macosArm64()
 
     js {
@@ -42,28 +50,6 @@ kotlin {
                 implementation(compose.animation)
             }
         }
-    }
-}
-
-android {
-    namespace = "dev.piotrprus.particleemitter"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 24
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

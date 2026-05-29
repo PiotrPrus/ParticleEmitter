@@ -3,22 +3,27 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.compose")
 }
 
 kotlin {
-    androidTarget {
+    android {
+        namespace = "dev.piotrprus.particleemitter.sampleshared"
+        compileSdk = 35
+        minSdk = 24
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
+
+        androidResources { enable = true }
     }
 
     jvm()
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
@@ -51,19 +56,5 @@ kotlin {
                 implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.1")
             }
         }
-    }
-}
-
-android {
-    namespace = "dev.piotrprus.particleemitter.sampleshared"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
