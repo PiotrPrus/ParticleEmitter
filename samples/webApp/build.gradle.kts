@@ -21,10 +21,10 @@ kotlin {
     sourceSets {
         webMain.dependencies {
             implementation(project(":samples:shared"))
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.ui)
-            implementation(compose.material3)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.material3)
         }
     }
 }

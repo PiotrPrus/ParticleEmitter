@@ -46,13 +46,13 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":particle-emitter"))
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.ui)
-                implementation(compose.animation)
-                implementation(compose.material3)
-                implementation(compose.materialIconsExtended)
-                implementation(compose.components.resources)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.animation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.material.icons.extended)
+                implementation(libs.compose.components.resources)
                 implementation(libs.navigation.compose)
             }
         }
