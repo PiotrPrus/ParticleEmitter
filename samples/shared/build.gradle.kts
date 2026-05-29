@@ -11,8 +11,8 @@ plugins {
 kotlin {
     android {
         namespace = "dev.piotrprus.particleemitter.sampleshared"
-        compileSdk = 35
-        minSdk = 24
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
