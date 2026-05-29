@@ -1,6 +1,6 @@
 # ParticleEmitter
 
-A Jetpack Compose particle effects library for Android. Create beautiful, physics-based particle animations with two rendering approaches optimized for different use cases.
+A Compose Multiplatform particle effects library for Android, iOS, desktop, and web. Create beautiful, physics-based particle animations with two rendering approaches optimized for different use cases.
 
 ## Features
 
@@ -21,15 +21,7 @@ See [PERFORMANCE.md](PERFORMANCE.md) for measured particle-count budgets per tar
 
 ## Installation
 
-Add the dependency to your module's `build.gradle`:
-
-```groovy
-dependencies {
-    implementation "io.github.piotrprus:particle-emitter:1.0.5"
-}
-```
-
-or with Kotlin DSL:
+For Android projects, add the dependency to your module's build file:
 
 ```kotlin
 dependencies {
@@ -37,20 +29,24 @@ dependencies {
 }
 ```
 
-Make sure you have `mavenCentral()` in your project's repositories:
+For KMP projects, add the dependency like this:
 
-```groovy
-repositories {
-    mavenCentral()
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.piotrprus:particle-emitter:1.0.5")
+        }
+    }
 }
 ```
 
 ## Modules
 
-| Module | Description |
-|--------|-------------|
-| `particle-emitter` | Core library — emitters, particle models, configs, rendering |
-| `sample` | Demo app showcasing different particle effects |
+| Module             | Description                                                               |
+|--------------------|---------------------------------------------------------------------------|
+| `particle-emitter` | Core library — emitters, particle models, configs, rendering              |
+| `samples`          | Demo app showcasing different particle effects on all supported platforms |
 
 ## Usage
 
