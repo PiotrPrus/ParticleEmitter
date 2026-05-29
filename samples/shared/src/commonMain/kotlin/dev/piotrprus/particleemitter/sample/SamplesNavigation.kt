@@ -42,13 +42,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-/**
- * Entry-point composable used by every sample application (Android, desktop,
- * iOS, web). Hosts a navigation graph over all the
- * [ParticleEmitter][dev.piotrprus.particleemitter] samples — the main menu
- * lists every sample and tapping one pushes a screen with its [Scaffold] and
- * a back arrow.
- */
 @Composable
 fun SamplesNavigation() {
     val navController = rememberNavController()
@@ -134,11 +127,11 @@ private fun SampleScaffold(title: String, onBack: (() -> Unit)? = null, content:
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = ExtendedColors.paletteNeutral2,
                     titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                ),
+                    navigationIconContentColor = Color.White
+                )
             )
         },
-        containerColor = ExtendedColors.paletteNeutral2,
+        containerColor = ExtendedColors.paletteNeutral2
     ) { padding ->
         Box(
             modifier = Modifier
@@ -156,7 +149,8 @@ private data class SampleEntry(
     val description: String,
 )
 
-private val sampleEntries = listOf(    SampleEntry(
+private val sampleEntries = listOf(
+    SampleEntry(
         route = "canvas",
         title = "Canvas Emitter",
         description = "High-performance canvas-based particles with layered star effects",
@@ -236,18 +230,18 @@ private fun SampleButton(title: String, description: String, onClick: () -> Unit
     Button(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp)
         ) {
             Text(text = title, style = MaterialTheme.typography.titleMedium)
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
             )
         }
     }
