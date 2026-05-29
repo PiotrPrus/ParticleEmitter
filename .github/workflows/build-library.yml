@@ -1,0 +1,62 @@
+name: Build library
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_call:
+
+concurrency:
+  group: build-library-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "JVM, Android, JS, Wasm"
+            os: ubuntu-latest
+            tasks: >-
+              :particle-emitter:jvmJar
+              :particle-emitter:assembleAndroidMain
+              :particle-emitter:compileKotlinJs
+              :particle-emitter:compileKotlinWasmJs
+          - name: "iOS, macOS"
+            os: macos-latest
+            tasks: >-
+              :particle-emitter:iosArm64MainKlibrary
+              :particle-emitter:iosSimulatorArm64MainKlibrary
+              :particle-emitter:macosArm64MainKlibrary
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Cache Kotlin/Native dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-${{ hashFiles('**/.lock') }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build library
+        run: ./gradlew ${{ matrix.tasks }}
