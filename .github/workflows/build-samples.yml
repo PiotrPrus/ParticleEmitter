@@ -107,6 +107,9 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_26.2.app/Contents/Developer
+
       - name: Build iOS sample (simulator, debug)
         working-directory: samples/iosApp
         run: >-
