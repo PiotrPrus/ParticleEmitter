@@ -50,7 +50,7 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
                         pendingParticles.value += (cfg.particlePerSecond * deltaSeconds)
                         val count = pendingParticles.value.toInt()
                         pendingParticles.value -= count
-                        createParticles(cfg, count)
+                        createParticles(cfg, count, frameNano)
                     }
 
                     val dt = deltaSeconds
@@ -162,7 +162,8 @@ fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 
 private fun createParticles(
     config: CanvasEmitterConfig,
-    count: Int
+    count: Int,
+    startTime: Long,
 ): List<CanvasParticle> {
     val gravityRadians = Math.toRadians(config.gravityAngle.toDouble())
     val gravityXDp = (config.gravityStrength * -sin(gravityRadians).toFloat()).dp
@@ -194,6 +195,7 @@ private fun createParticles(
             scaleEasing = config.scaleEasing,
             targetScale = config.targetScaleRange.random().toFloat(),
             startScale = config.startScaleRange.random().toFloat(),
+            startTime = startTime,
         )
     }
 }

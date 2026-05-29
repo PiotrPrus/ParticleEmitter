@@ -43,7 +43,6 @@ import particleemitter.samples.shared.generated.resources.star_four
 import org.jetbrains.compose.resources.imageResource
 import kotlin.math.PI
 import kotlin.math.atan2
-import kotlin.math.sin
 import kotlin.math.sqrt
 
 @Composable
@@ -83,7 +82,7 @@ fun GravityPointSample() {
     val dy = gravityPointPx.y - emitterPx.y
     val distancePx = sqrt(dx * dx + dy * dy)
     // atan2(-dx, dy) maps: down=0, left=90, right=-90, up=180
-    val gravityAngleDeg = (atan2(-dx.toDouble(), dy.toDouble()) * 180.0 / PI).toInt()
+    val gravityAngleDeg = (atan2(-dx.toDouble(), dy.toDouble()) * 180 / PI).toInt()
     // Scale strength by distance — farther point = stronger pull
     val maxDistance = sqrt(
         (containerSize.width * containerSize.width + containerSize.height * containerSize.height).toFloat()

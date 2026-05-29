@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import kotlin.time.Clock
 
 data class CanvasParticle(
     val shape: ParticleShape,
@@ -28,7 +27,7 @@ data class CanvasParticle(
     val scaleEasing: Easing,
     val alphaEasing: Easing,
     val currentPosition: DpOffset = startPoint,
-    val startTime: Long = Clock.System.now().toEpochMilliseconds(),
+    val startTime: Long,
     val blendMode: BlendMode,
     val scale: Float = 1f,
     val alpha: Float = 1f,
