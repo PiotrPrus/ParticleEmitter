@@ -8,3 +8,8 @@ local.properties
 .externalNativeBuild
 .cxx
 .claude/
+.junie/
+.kotlin/
+# Xcode user-specific files
+xcuserdata/
+*.xcworkspace/xcuserdata/

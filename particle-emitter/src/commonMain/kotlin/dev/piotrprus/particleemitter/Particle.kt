@@ -1,0 +1,21 @@
+package dev.piotrprus.particleemitter
+
+import androidx.compose.runtime.Composable
+
+data class Particle(
+    val id: String,
+    val angle: Int,
+    val initialForce: Int,
+    val gravityStrength: Float,
+    val gravityAngle: Int,
+    val lifespanMillis: Long,
+    val maxHorizontalDisplacementDp: Int,
+    val rotationMultiplier: Float,
+    val content: @Composable () -> Unit
+) {
+    val radians
+        get() = Math.toRadians(angle.toDouble())
+
+    val gravityRadians
+        get() = Math.toRadians(gravityAngle.toDouble())
+}
