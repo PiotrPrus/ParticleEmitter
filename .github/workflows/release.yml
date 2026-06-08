@@ -1,0 +1,68 @@
+name: Release
+
+# Push a tag like `v1.1.0` to build all targets and publish + release
+# `io.github.piotrprus:particle-emitter` to Maven Central automatically.
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # Validate every target compiles before we publish anything immutable.
+  build:
+    uses: ./.github/workflows/build-library.yml
+
+  publish:
+    name: Publish to Maven Central
+    needs: build
+    # macOS runner is required to build the iOS/macOS klibs that are part
+    # of the multiplatform publication.
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Verify tag matches library version
+        run: |
+          VERSION=$(grep -oE 'coordinates\("io.github.piotrprus", "particle-emitter", "[^"]+"\)' particle-emitter/build.gradle.kts | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          TAG=${GITHUB_REF_NAME#v}
+          echo "Tag: $TAG | build.gradle.kts: $VERSION"
+          if [ "$VERSION" != "$TAG" ]; then
+            echo "::error::Tag v$TAG does not match coordinates version $VERSION in particle-emitter/build.gradle.kts. Bump the version and retag."
+            exit 1
+          fi
+
+      - name: Cache Kotlin/Native dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-${{ hashFiles('**/.lock') }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Publish and release to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
+          # Key id is not secret; this is the signing key generated 2026-06-08.
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: "4636311B"
+        run: ./gradlew :particle-emitter:publishAndReleaseToMavenCentral --no-configuration-cache --stacktrace
