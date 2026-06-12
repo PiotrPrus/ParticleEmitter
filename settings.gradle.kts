@@ -17,6 +17,8 @@ dependencyResolutionManagement {
 
 include(":particle-emitter")
 
+include(":presentation")
+
 include(":samples:androidApp")
 include(":samples:shared")
 include(":samples:desktopApp")
