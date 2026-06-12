@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
@@ -35,7 +34,6 @@ import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.ParticleShape
 import dev.piotrprus.particleemitter.presentation.deck.Slide
 import dev.piotrprus.particleemitter.presentation.demos.DemoCard
-import dev.piotrprus.particleemitter.presentation.demos.GlowRingDemo
 import dev.piotrprus.particleemitter.presentation.ui.BodyText
 import dev.piotrprus.particleemitter.presentation.ui.Bullet
 import dev.piotrprus.particleemitter.presentation.ui.CodeBlock
@@ -45,7 +43,7 @@ import dev.piotrprus.particleemitter.presentation.ui.SlideSurface
 import dev.piotrprus.particleemitter.presentation.ui.SlideTitle
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 
-val multiplatformSlide = Slide(steps = 4) {
+val multiplatformSlide = Slide(steps = 5) {
     SlideSurface {
         SlideTitle("One config, four platforms")
         Spacer(modifier = Modifier.height(90.dp))
@@ -67,7 +65,7 @@ val multiplatformSlide = Slide(steps = 4) {
             }
         }
         Spacer(modifier = Modifier.height(80.dp))
-        Reveal(at = 4) {
+        Reveal(at = 5) {
             BodyText(
                 "Even this presentation is a Compose Desktop app — every demo you saw was live.",
                 color = DeckColors.textSecondary,
@@ -250,37 +248,39 @@ private fun FirstEmitterDemo() {
 
 val inspirationSlide = Slide(steps = 4) {
     SlideSurface {
-        SlideTitle("Build something awesome — 25 minutes")
+        SlideTitle("Build something awesome")
         Spacer(modifier = Modifier.height(50.dp))
         Row(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(50.dp),
         ) {
             Reveal(at = 1, modifier = Modifier.weight(1f)) {
-                InspirationCard("inspiration/fireworks-night.gif", "Fireworks finale")
+                InspirationPlaceholder("Inspiration #1")
             }
             Reveal(at = 2, modifier = Modifier.weight(1f)) {
-                InspirationCard("inspiration/golden-confetti.gif", "Golden confetti")
+                InspirationPlaceholder("Inspiration #2")
             }
             Reveal(at = 3, modifier = Modifier.weight(1f)) {
-                InspirationCard("inspiration/glow-ring.gif", "Pulsing glow ring", liveDemo = true)
+                InspirationPlaceholder("Inspiration #3")
             }
         }
         Spacer(modifier = Modifier.height(44.dp))
         Reveal(at = 4) {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                BodyText(
-                    "…or: a snow globe with a shake button · tap-to-confetti cannon · campfire embers · " +
-                        "soda fizz tied to a slider · magic wand drag trail · rain with a wind slider",
-                    color = DeckColors.textSecondary,
-                )
-            }
+            BodyText(
+                "…or: a snow globe with a shake button · tap-to-confetti cannon · campfire embers · " +
+                    "soda fizz tied to a slider · magic wand drag trail · rain with a wind slider",
+                color = DeckColors.textSecondary,
+            )
         }
     }
 }
 
+/**
+ * Placeholder card — swap in your own animation before the talk, e.g. a
+ * [GifImage] from resources or a live emitter demo.
+ */
 @Composable
-private fun InspirationCard(resource: String, label: String, liveDemo: Boolean = false) {
+private fun InspirationPlaceholder(label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
@@ -291,20 +291,17 @@ private fun InspirationCard(resource: String, label: String, liveDemo: Boolean =
                 .border(1.dp, DeckColors.codeBorder, RoundedCornerShape(24.dp)),
             contentAlignment = Alignment.Center,
         ) {
-            if (liveDemo) {
-                GlowRingDemo(width = 520, height = 560)
-            } else {
-                GifImage(
-                    resourcePath = resource,
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                )
-            }
+            Text(
+                text = "Your\nanimation\nhere",
+                color = DeckColors.textSecondary,
+                fontSize = 34.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+            )
         }
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = label + if (liveDemo) "  (live!)" else "",
+            text = label,
             color = DeckColors.textPrimary,
             fontSize = 30.sp,
             fontWeight = FontWeight.SemiBold,

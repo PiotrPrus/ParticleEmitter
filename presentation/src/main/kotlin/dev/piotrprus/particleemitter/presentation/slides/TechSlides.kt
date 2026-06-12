@@ -457,32 +457,3 @@ private fun BudgetRow(fps: String, budget: String, note: String) {
         )
     }
 }
-
-val perfLessonsSlide = Slide(steps = 3) {
-    SlideSurface {
-        SlideTitle("Performance lessons that paid off")
-        Spacer(modifier = Modifier.height(70.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(54.dp)) {
-            Reveal(at = 1) {
-                Bullet(
-                    emphasis = "Cache animation specs per particle",
-                    text = "get() properties rebuilt a tween on every access — 1.2M allocations/sec. " +
-                        "Constructor defaults instead: +21% frames",
-                )
-            }
-            Reveal(at = 2) {
-                Bullet(
-                    emphasis = "Delete what nobody reads",
-                    text = "An unused id meant UUID.randomUUID() per particle. Removing it: +8% frames",
-                )
-            }
-            Reveal(at = 3) {
-                Bullet(
-                    emphasis = "Skip invisible work",
-                    text = "Early-return when alpha ≤ 0.01 or scale ≤ 0.01: +92% frames, " +
-                        "median frame time halved",
-                )
-            }
-        }
-    }
-}

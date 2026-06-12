@@ -12,7 +12,6 @@ fun deckSlides(): List<Slide> = listOf(
     emissionSlide,
     edgeBehaviorSlide,
     performanceSlide,
-    perfLessonsSlide,
     multiplatformSlide,
     setupSlide,
     dependencySlide,

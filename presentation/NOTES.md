@@ -47,31 +47,29 @@ Run with: `./gradlew :presentation:run`
 - Headline: 5k particles/sec at 60 FPS is the sweet spot.
 - Why multi-emitter wins at 10k: each emitter has its own coroutine → parallelizes across cores.
 
-## 10. Performance lessons
-- Each bullet is a real, measured commit. Profile first, optimize second.
-- The alpha-skip one is the crowd-pleaser: +92% frames from a two-line early return.
-
-## 11. One config, four platforms
-- THE REVEAL: this deck is a Compose Desktop app; everything animated was live.
+## 10. One config, four platforms
+- Four reveals for the platforms, then a fifth for THE REVEAL: this deck is a
+  Compose Desktop app; everything animated was live.
 - Transition to hands-on part here.
 
-## 12. Setup (guide them, ~10 min)
+## 11. Setup (guide them, ~10 min)
 - kmp.jetbrains.com → check all four targets, "Share UI with Compose".
 - Walk the room; pair people with broken Gradle syncs.
 - Desktop target = fastest iteration (no emulator).
 
-## 13. Dependency
+## 12. Dependency
 - Maven Central, no extra repositories. Version 1.1.0.
 
-## 14. First emitter
+## 13. First emitter
 - Type it live with them if time allows; otherwise let them copy from the slide.
 - Point out: BlendMode.Screen makes overlapping particles glow.
 
-## 15. Inspiration (hands-on brief, 25–30 min)
-- Two GIFs from the web + one LIVE glow ring built with the library.
+## 14. Inspiration (hands-on brief)
+- Three placeholder cards — swap in your own animations (GifImage from
+  resources, or a live emitter demo) before the talk.
 - Challenge ideas are on the slide; encourage interactions (tap, drag, sliders).
 - Announce show-and-tell at the end — 3-4 volunteers demo their effect.
 
-## 16. Closing
+## 15. Closing
 - Left QR = repo. Right QR = placeholder — generate one for slides/sources before the talk.
 - Ask for GitHub stars, mention issues/PRs welcome.
