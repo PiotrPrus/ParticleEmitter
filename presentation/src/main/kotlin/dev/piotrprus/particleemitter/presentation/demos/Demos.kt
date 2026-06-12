@@ -177,13 +177,15 @@ fun EdgeBehaviorDemo(
     CanvasParticleEmitter(
         modifier = modifier.fillMaxSize(),
         config = CanvasEmitterConfig(
-            particlePerSecond = 30,
+            particlePerSecond = 25,
             emitterCenter = DpOffset(width.dp / 2, height.dp / 3),
             startRegionShape = CanvasEmitterConfig.Shape.POINT,
             startRegionSize = DpSize(0.dp, 0.dp),
             particleShapes = listOf(ParticleShape.Circle),
-            lifespanRange = 3500..5000,
-            fadeOutTime = 600..900,
+            // alpha animates from birth over fadeOutTime, so keep it close to
+            // the lifespan or particles vanish before they ever reach an edge
+            lifespanRange = 6500..8500,
+            fadeOutTime = 6000..8000,
             scaleTime = 200..400,
             colors = listOf(Color(0xFFFFB74D), Color(0xFFFF8A65), Color(0xFFFFF176)),
             particleSizes = listOf(DpSize(12.dp, 12.dp), DpSize(16.dp, 16.dp)),
