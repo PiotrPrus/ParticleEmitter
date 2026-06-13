@@ -34,6 +34,7 @@ import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.ParticleShape
 import dev.piotrprus.particleemitter.presentation.deck.Slide
 import dev.piotrprus.particleemitter.presentation.demos.DemoCard
+import dev.piotrprus.particleemitter.presentation.demos.DisintegratingBoxDemo
 import dev.piotrprus.particleemitter.presentation.demos.FlameDemo
 import dev.piotrprus.particleemitter.presentation.demos.MagicWandDemo
 import dev.piotrprus.particleemitter.presentation.demos.MatrixRainDemo
@@ -399,6 +400,22 @@ private fun QrCard(label: String, data: String?) {
             color = DeckColors.textSecondary,
             fontSize = 28.sp,
         )
+    }
+}
+
+val bonusSlide = Slide {
+    SlideSurface {
+        SlideTitle("Bonus — a box of candies 🍬")
+        Spacer(modifier = Modifier.height(40.dp))
+        BodyText(
+            "A 100dp box waits 2s, then bursts into particles: they pop a little, " +
+                "fall under gravity and bounce off the walls (damping 0.5) — like sweets in a jar.",
+            color = DeckColors.textSecondary,
+        )
+        Spacer(modifier = Modifier.height(40.dp))
+        DemoCard(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            DisintegratingBoxDemo()
+        }
     }
 }
 

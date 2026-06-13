@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,6 +46,7 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlinx.coroutines.delay
 import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.EdgeBehavior
@@ -789,6 +791,86 @@ fun GravityCaseDemo(
                 drawCircle(Color.White.copy(alpha = 0.18f), radius = 15f, center = center)
                 drawCircle(Color.White, radius = 6f, center = center)
             }
+        }
+    }
+}
+
+private val candyColors = listOf(
+    Color(0xFFFF5252), Color(0xFFFFD740), Color(0xFF69F0AE),
+    Color(0xFF40C4FF), Color(0xFFE040FB), Color(0xFFFFFFFF),
+)
+
+/**
+ * A solid blue box sits in the centre; after 2s it disintegrates into a burst
+ * of candy particles that pop outward a little, fall under gravity and bounce
+ * off the walls with 0.5 damping — settling at the bottom like sweets dropped
+ * into a jar. Loops. A bonus eye-candy demo.
+ */
+@Composable
+fun DisintegratingBoxDemo(modifier: Modifier = Modifier) {
+    val density = LocalDensity.current
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
+    var cycle by remember { mutableStateOf(0) }
+    var exploded by remember { mutableStateOf(false) }
+    var bursting by remember { mutableStateOf(false) }
+
+    LaunchedEffect(cycle) {
+        exploded = false
+        bursting = false
+        delay(2000)        // the box waits…
+        exploded = true    // …vanishes…
+        bursting = true    // …and bursts into candies
+        delay(140)         // brief one-shot emission window
+        bursting = false
+        delay(6500)        // let them bounce and settle
+        cycle++            // restart the loop
+    }
+
+    Box(
+        modifier = modifier.fillMaxSize().onSizeChanged { containerSize = it },
+        contentAlignment = Alignment.Center,
+    ) {
+        if (containerSize != IntSize.Zero) {
+            val center = with(density) {
+                DpOffset((containerSize.width / 2).toDp(), (containerSize.height / 2).toDp())
+            }
+            // key() gives each cycle a fresh emitter so old candies clear out
+            key(cycle) {
+                CanvasParticleEmitter(
+                    modifier = Modifier.fillMaxSize(),
+                    config = CanvasEmitterConfig(
+                        particlePerSecond = if (bursting) 2600 else 0,
+                        emitterCenter = center,
+                        startRegionShape = CanvasEmitterConfig.Shape.RECT,
+                        startRegionSize = DpSize(100.dp, 100.dp),
+                        particleShapes = listOf(ParticleShape.Circle),
+                        lifespanRange = 5000..7000,
+                        fadeOutTime = 4500..6500,
+                        scaleTime = 100..200,
+                        colors = candyColors,
+                        particleSizes = listOf(
+                            DpSize(10.dp, 10.dp), DpSize(14.dp, 14.dp), DpSize(8.dp, 8.dp),
+                        ),
+                        spread = IntRange(0, 360),
+                        initialForce = IntRange(60, 200), // pop a little, not crazy
+                        rotationRange = IntRange(-180, 180),
+                        startScaleRange = IntRange(1, 1),
+                        targetScaleRange = IntRange(1, 1),
+                        gravityStrength = 320f,
+                        gravityAngle = 0,
+                        edgeBehavior = EdgeBehavior.Bounce(damping = 0.5f),
+                    ),
+                )
+            }
+        }
+        // the solid blue box, shown until it disintegrates
+        if (!exploded) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFF2962FF)),
+            )
         }
     }
 }

@@ -118,3 +118,11 @@ Run with: `./gradlew :presentation:run`
 ## 17. Closing
 - Left QR = repo. Right QR = placeholder — generate one for slides/sources before the talk.
 - Ask for GitHub stars, mention issues/PRs welcome.
+
+## 18. Bonus — box of candies (post-workshop)
+- Shown after the workshop as a parting bit of eye-candy.
+- A 100dp blue box waits 2s, then disintegrates into candy particles: a gentle
+  outward pop, gravity pulls them down, and EdgeBehavior.Bounce(0.5) lets them
+  bounce off the card walls and settle at the bottom like sweets in a jar.
+- Loops on its own (~9s). Combines initial force + gravity + bounce — a recap
+  of the whole physics story in one shot.
