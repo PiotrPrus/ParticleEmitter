@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,17 +21,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.piotrprus.particleemitter.EdgeBehavior
 import dev.piotrprus.particleemitter.presentation.deck.Slide
 import dev.piotrprus.particleemitter.presentation.demos.AmbientParticlesDemo
-import dev.piotrprus.particleemitter.presentation.demos.BubblesDemo
+import dev.piotrprus.particleemitter.presentation.demos.CanvasThroughputDemo
 import dev.piotrprus.particleemitter.presentation.demos.EdgeBehaviorDemo
+import dev.piotrprus.particleemitter.presentation.demos.GravityShowcaseDemo
 import dev.piotrprus.particleemitter.presentation.demos.ConfettiDemo
 import dev.piotrprus.particleemitter.presentation.demos.DemoCard
-import dev.piotrprus.particleemitter.presentation.demos.EmojiRainDemo
+import dev.piotrprus.particleemitter.presentation.demos.LayoutBurstDemo
+import dev.piotrprus.particleemitter.presentation.demos.GravityCaseDemo
 import dev.piotrprus.particleemitter.presentation.ui.BodyText
 import dev.piotrprus.particleemitter.presentation.ui.Bullet
 import dev.piotrprus.particleemitter.presentation.ui.CodeBlock
@@ -65,7 +71,7 @@ val titleSlide = Slide {
             )
         }
         Text(
-            text = "Piotr Prus  ·  GDG London",
+            text = "Piotr Prus @ TILT  ·  GDE Android",
             color = DeckColors.textSecondary,
             fontSize = 30.sp,
             modifier = Modifier
@@ -117,7 +123,7 @@ val whatIsItSlide = Slide(steps = 4) {
     }
 }
 
-val twoEnginesSlide = Slide(steps = 2) {
+val layoutEngineSlide = Slide(steps = 1) {
     SlideSurface {
         SlideTitle("Two rendering engines")
         Spacer(modifier = Modifier.height(70.dp))
@@ -138,7 +144,25 @@ val twoEnginesSlide = Slide(steps = 2) {
                     accent = DeckColors.warm,
                 )
             }
-            Reveal(at = 2, modifier = Modifier.weight(1f)) {
+            Reveal(at = 1, modifier = Modifier.weight(1f).fillMaxSize()) {
+                LabeledDemo(caption = "Real composables in flight — badges, chips, cards") {
+                    LayoutBurstDemo()
+                }
+            }
+        }
+    }
+}
+
+val canvasEngineSlide = Slide(steps = 1) {
+    SlideSurface {
+        SlideTitle("Two rendering engines")
+        Spacer(modifier = Modifier.height(70.dp))
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(60.dp),
+        ) {
+            // The explanation greets you as the slide arrives…
+            Box(modifier = Modifier.weight(1f).fillMaxSize()) {
                 EngineCard(
                     name = "CanvasParticleEmitter",
                     tagline = "Canvas-based",
@@ -146,11 +170,35 @@ val twoEnginesSlide = Slide(steps = 2) {
                         "Zero layout nodes — pure drawBehind",
                         "Shapes, images, text rasterized once",
                         "One frame clock updates the whole world",
-                        "Thousands of particles at 60 FPS",
+                        "Thousands of particles at 60/120 FPS",
                     ),
                     accent = DeckColors.accentAlt,
                 )
             }
+
+            // …and the example reveals on the next press.
+            Reveal(at = 1, modifier = Modifier.weight(1f).fillMaxSize()) {
+                LabeledDemo(caption = "10,000 particles/sec — one Canvas") {
+                    CanvasThroughputDemo(width = 820, height = 760)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LabeledDemo(caption: String, content: @Composable () -> Unit) {
+    DemoCard(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            content()
+            Text(
+                text = caption,
+                color = DeckColors.textSecondary,
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 18.dp),
+            )
         }
     }
 }
@@ -234,70 +282,130 @@ val frameLoopSlide = Slide(steps = 2) {
 
 val physicsSlide = Slide(steps = 2) {
     SlideSurface {
-        SlideTitle("Δt physics — semi-implicit Euler")
-        Spacer(modifier = Modifier.height(50.dp))
+        SlideTitle("How a particle's position is calculated")
+        Spacer(modifier = Modifier.height(44.dp))
+        BodyText("Start point, plus two terms — the throw and the pull:")
+        Spacer(modifier = Modifier.height(34.dp))
+        PositionFormula()
+        Spacer(modifier = Modifier.height(40.dp))
         Reveal(at = 1) {
             CodeBlock(
                 code = """
-                    // velocity first: v += a · dt
-                    var vx = particle.velocityX + particle.gravityX * dt
-                    var vy = particle.velocityY + particle.gravityY * dt
-
-                    // then position: p += v · dt
-                    var x = particle.position.x + vx * dt
-                    var y = particle.position.y + vy * dt
+                    // split per axis — 0° launch points up, y grows downward
+                    x = startX + force * sin(angle) * t  +  0.5f * gravityX * t * t
+                    y = startY - force * cos(angle) * t  +  0.5f * gravityY * t * t
                 """,
-                fontSize = 30.sp,
+                fontSize = 26.sp,
             )
         }
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(40.dp))
         Reveal(at = 2) {
-            Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                Bullet(text = "Frame-rate independent: same arc at 60 and 120 FPS")
-                Bullet(text = "Everything in dp — density handled once, identical on every screen")
-                Bullet(text = "Parabolic confetti arcs fall out of two additions per axis")
+            Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
+                Bullet(text = "No gravity → the t² term is zero: a straight line at constant speed")
+                Bullet(text = "No initial force → the velocity term is zero: a pure accelerating fall")
+                Bullet(text = "Both terms → a parabola, the arc your eye reads as \"thrown\"")
+                Bullet(
+                    text = "The engine integrates this each frame (v += g·dt, then p += v·dt) " +
+                        "— identical arc at 60 or 120 FPS",
+                )
             }
         }
     }
 }
 
-val gravitySlide = Slide(steps = 2) {
-    SlideSurface {
-        SlideTitle("Gravity is just a vector")
-        Spacer(modifier = Modifier.height(50.dp))
-        Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(60.dp)) {
-            Column(modifier = Modifier.weight(1.2f)) {
-                Reveal(at = 1) {
-                    CodeBlock(
-                        code = """
-                            // 0° = down, 180° = up, ±90° = sideways wind
-                            val radians = toRadians(gravityAngle.toDouble())
-                            val gravityX = (strength * -sin(radians)).dp
-                            val gravityY = (strength *  cos(radians)).dp
+/** The kinematic equation with its two terms colour-coded to match slide 7. */
+@Composable
+private fun PositionFormula() {
+    val formula = buildAnnotatedString {
+        withStyle(SpanStyle(color = DeckColors.textPrimary)) { append("position = start + ") }
+        withStyle(SpanStyle(color = DeckColors.warm, fontWeight = FontWeight.Bold)) {
+            append("velocity · t")
+        }
+        withStyle(SpanStyle(color = DeckColors.textPrimary)) { append("  +  ") }
+        withStyle(SpanStyle(color = DeckColors.accentAlt, fontWeight = FontWeight.Bold)) {
+            append("½ · gravity · t²")
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(text = formula, fontSize = 46.sp, fontWeight = FontWeight.SemiBold)
+        Row(horizontalArrangement = Arrangement.spacedBy(48.dp)) {
+            FormulaLegend(DeckColors.warm, "velocity · t", "the initial force — the throw")
+            FormulaLegend(DeckColors.accentAlt, "½ · gravity · t²", "acceleration — the pull")
+        }
+    }
+}
 
-                            // each particle launches along its own angle
-                            val angle = config.spread.random()
-                            val force = config.initialForce.random()
-                            val vx = (force * sin(angle.radians)).dp
-                            val vy = (-force * cos(angle.radians)).dp
-                        """,
-                        fontSize = 26.sp,
-                    )
+@Composable
+private fun FormulaLegend(color: Color, term: String, meaning: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+        Box(modifier = Modifier.size(16.dp).background(color, RoundedCornerShape(4.dp)))
+        Column {
+            Text(text = term, color = color, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+            Text(text = meaning, color = DeckColors.textSecondary, fontSize = 22.sp)
+        }
+    }
+}
+
+val gravityRealismSlide = Slide(steps = 3) {
+    SlideSurface {
+        SlideTitle("Why gravity makes it feel real")
+        Spacer(modifier = Modifier.height(36.dp))
+        BodyText(
+            "Same emitter, trembling around the centre, ~20 particles/sec. Only the " +
+                "force and gravity differ — watch how each changes the motion.",
+            color = DeckColors.textSecondary,
+        )
+        Spacer(modifier = Modifier.height(40.dp))
+        Row(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(44.dp),
+        ) {
+            Reveal(at = 1, modifier = Modifier.weight(1f).fillMaxHeight()) {
+                TraceCard("Force only", "g = 0  →  straight line", DeckColors.warm) {
+                    GravityCaseDemo(initialForce = 200..300, gravityStrength = 0f, accent = DeckColors.warm)
                 }
             }
-            Column(
-                modifier = Modifier.weight(0.8f),
-                verticalArrangement = Arrangement.spacedBy(40.dp),
-            ) {
-                Reveal(at = 2, modifier = Modifier.weight(1f).fillMaxWidth()) {
-                    DemoCard(modifier = Modifier.fillMaxSize()) {
-                        BubblesDemo(width = 520, height = 380)
-                    }
+            Reveal(at = 2, modifier = Modifier.weight(1f).fillMaxHeight()) {
+                TraceCard("Gravity only", "v₀ = 0  →  accelerating fall", DeckColors.accentAlt) {
+                    GravityCaseDemo(initialForce = 0..0, gravityStrength = 300f, accent = DeckColors.accentAlt)
                 }
-                Reveal(at = 2, modifier = Modifier.weight(1f).fillMaxWidth()) {
-                    DemoCard(modifier = Modifier.fillMaxSize()) {
-                        EmojiRainDemo(width = 520, height = 380)
-                    }
+            }
+            Reveal(at = 3, modifier = Modifier.weight(1f).fillMaxHeight()) {
+                TraceCard("Force + gravity", "v·t + ½·g·t²  →  arc", DeckColors.accent) {
+                    GravityCaseDemo(initialForce = 200..300, gravityStrength = 300f, accent = DeckColors.accent)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(28.dp))
+        Reveal(at = 3) {
+            BodyText(
+                "Linear motion looks like a screensaver. The parabola is what makes confetti " +
+                    "just feel right and the eye believes it.",
+            )
+        }
+    }
+}
+
+@Composable
+private fun TraceCard(title: String, formula: String, accent: Color, content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        DemoCard(modifier = Modifier.weight(1f).fillMaxWidth()) { content() }
+        Text(text = title, color = DeckColors.textPrimary, fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
+        Text(text = formula, color = accent, fontSize = 24.sp)
+    }
+}
+
+val gravitySlide = Slide(steps = 2) {
+    SlideSurface {
+        SlideTitle("Feel the magic with Gravity")
+        Spacer(modifier = Modifier.height(50.dp))
+        Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(60.dp)) {
+            Reveal(at = 1, modifier = Modifier.weight(1f).fillMaxSize()) {
+                DemoCard(modifier = Modifier.fillMaxSize()) {
+                    GravityShowcaseDemo()
                 }
             }
         }

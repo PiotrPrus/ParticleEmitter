@@ -34,11 +34,13 @@ import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.ParticleShape
 import dev.piotrprus.particleemitter.presentation.deck.Slide
 import dev.piotrprus.particleemitter.presentation.demos.DemoCard
+import dev.piotrprus.particleemitter.presentation.demos.FlameDemo
+import dev.piotrprus.particleemitter.presentation.demos.MagicWandDemo
+import dev.piotrprus.particleemitter.presentation.demos.MatrixRainDemo
 import dev.piotrprus.particleemitter.presentation.ui.BodyText
 import dev.piotrprus.particleemitter.presentation.ui.Bullet
 import dev.piotrprus.particleemitter.presentation.ui.CodeBlock
 import dev.piotrprus.particleemitter.presentation.ui.DeckColors
-import dev.piotrprus.particleemitter.presentation.ui.GifImage
 import dev.piotrprus.particleemitter.presentation.ui.SlideSurface
 import dev.piotrprus.particleemitter.presentation.ui.SlideTitle
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
@@ -97,28 +99,28 @@ private fun PlatformCard(name: String, emoji: String) {
 
 val setupSlide = Slide(steps = 3) {
     SlideSurface {
-        SlideTitle("Your turn — new KMP project")
+        SlideTitle("Your turn — new project")
         Spacer(modifier = Modifier.height(70.dp))
         Column(verticalArrangement = Arrangement.spacedBy(54.dp)) {
             Reveal(at = 1) {
                 StepRow(
                     number = "1",
-                    title = "kmp.jetbrains.com",
-                    detail = "Kotlin Multiplatform wizard — check Android, iOS, Desktop, Web · share UI with Compose",
+                    title = "Android Studio → New Project",
+                    detail = "Pick Empty Activity (Compose) — or the Kotlin Multiplatform template if you want all targets",
                 )
             }
             Reveal(at = 2) {
                 StepRow(
                     number = "2",
-                    title = "Unzip & open in Android Studio",
-                    detail = "Let Gradle sync finish — grab a coffee, it's earned it",
+                    title = "Add the library dependency",
+                    detail = "io.github.piotrprus:particle-emitter:1.1.0 — Maven Central, snippet on the next slide",
                 )
             }
             Reveal(at = 3) {
                 StepRow(
                     number = "3",
-                    title = "Run the desktop target",
-                    detail = "./gradlew :composeApp:run — fastest feedback loop for playing with particles",
+                    title = "Sync & run",
+                    detail = "Hit Run on the emulator — or ./gradlew :composeApp:run if you went multiplatform",
                 )
             }
         }
@@ -161,27 +163,62 @@ private fun StepRow(number: String, title: String, detail: String) {
     }
 }
 
-val dependencySlide = Slide(steps = 1) {
+val dependencySlide = Slide(steps = 2) {
     SlideSurface {
         SlideTitle("Add the dependency")
         Spacer(modifier = Modifier.height(70.dp))
         BodyText("Published on Maven Central — nothing else to configure.")
-        Spacer(modifier = Modifier.height(40.dp))
-        Reveal(at = 1) {
-            CodeBlock(
-                code = """
-                    // composeApp/build.gradle.kts
-                    kotlin {
-                        sourceSets {
-                            commonMain.dependencies {
-                                implementation("io.github.piotrprus:particle-emitter:1.1.0")
+        Spacer(modifier = Modifier.height(50.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(60.dp),
+        ) {
+            Reveal(at = 1, modifier = Modifier.weight(1f)) {
+                DependencyVariant(label = "Android — app/build.gradle.kts") {
+                    CodeBlock(
+                        code = """
+                            dependencies {
+                                implementation(
+                                    "io.github.piotrprus:particle-emitter:1.1.0"
+                                )
                             }
-                        }
-                    }
-                """,
-                fontSize = 30.sp,
-            )
+                        """,
+                        fontSize = 26.sp,
+                    )
+                }
+            }
+            Reveal(at = 2, modifier = Modifier.weight(1f)) {
+                DependencyVariant(label = "Multiplatform — composeApp/build.gradle.kts") {
+                    CodeBlock(
+                        code = """
+                            kotlin {
+                                sourceSets {
+                                    commonMain.dependencies {
+                                        implementation(
+                                            "io.github.piotrprus:particle-emitter:1.1.0"
+                                        )
+                                    }
+                                }
+                            }
+                        """,
+                        fontSize = 26.sp,
+                    )
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun DependencyVariant(label: String, content: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        Text(
+            text = label.uppercase(),
+            color = DeckColors.accentAlt,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        content()
     }
 }
 
@@ -255,32 +292,34 @@ val inspirationSlide = Slide(steps = 4) {
             horizontalArrangement = Arrangement.spacedBy(50.dp),
         ) {
             Reveal(at = 1, modifier = Modifier.weight(1f)) {
-                InspirationPlaceholder("Inspiration #1")
+                InspirationCard("Campfire flame") {
+                    FlameDemo()
+                }
             }
             Reveal(at = 2, modifier = Modifier.weight(1f)) {
-                InspirationPlaceholder("Inspiration #2")
+                InspirationCard("Matrix rain") {
+                    MatrixRainDemo()
+                }
             }
             Reveal(at = 3, modifier = Modifier.weight(1f)) {
-                InspirationPlaceholder("Inspiration #3")
+                InspirationCard("Magic wand") {
+                    MagicWandDemo()
+                }
             }
         }
         Spacer(modifier = Modifier.height(44.dp))
         Reveal(at = 4) {
             BodyText(
-                "…or: a snow globe with a shake button · tap-to-confetti cannon · campfire embers · " +
-                    "soda fizz tied to a slider · magic wand drag trail · rain with a wind slider",
+                "Use your imagination and build something awesome with me (and the library). Get featured on socials and/or in library examples",
                 color = DeckColors.textSecondary,
             )
         }
     }
 }
 
-/**
- * Placeholder card — swap in your own animation before the talk, e.g. a
- * [GifImage] from resources or a live emitter demo.
- */
+/** Framed inspiration tile: dark rounded stage with a label underneath. */
 @Composable
-private fun InspirationPlaceholder(label: String) {
+private fun InspirationCard(label: String, content: @Composable () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
@@ -291,13 +330,7 @@ private fun InspirationPlaceholder(label: String) {
                 .border(1.dp, DeckColors.codeBorder, RoundedCornerShape(24.dp)),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = "Your\nanimation\nhere",
-                color = DeckColors.textSecondary,
-                fontSize = 34.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-            )
+            content()
         }
         Spacer(modifier = Modifier.height(20.dp))
         Text(
@@ -320,10 +353,6 @@ val closingSlide = Slide {
             QrCard(
                 label = "github.com/PiotrPrus/ParticleEmitter",
                 data = "https://github.com/PiotrPrus/ParticleEmitter",
-            )
-            QrCard(
-                label = "Slides & sources",
-                data = null,
             )
             Column(
                 modifier = Modifier.align(Alignment.CenterVertically),

@@ -5,9 +5,11 @@ import dev.piotrprus.particleemitter.presentation.deck.Slide
 fun deckSlides(): List<Slide> = listOf(
     titleSlide,
     whatIsItSlide,
-    twoEnginesSlide,
+    layoutEngineSlide,
+    canvasEngineSlide,
     frameLoopSlide,
     physicsSlide,
+    gravityRealismSlide,
     gravitySlide,
     emissionSlide,
     edgeBehaviorSlide,
