@@ -7,6 +7,7 @@ compose-multiplatform = "1.11.0"
 compose-material3 = "1.11.0-alpha07"
 compose-material-icons-extended = "1.7.3"
 maven-publish = "0.36.0"
+dokka = "2.2.0"
 androidx-core-ktx = "1.15.0"
 androidx-lifecycle = "2.10.0"
 androidx-activity-compose = "1.13.0"
@@ -36,3 +37,4 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

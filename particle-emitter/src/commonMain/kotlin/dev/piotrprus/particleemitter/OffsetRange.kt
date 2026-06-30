@@ -2,6 +2,15 @@ package dev.piotrprus.particleemitter
 
 import androidx.compose.ui.geometry.Offset
 
+/**
+ * A rectangular range of [Offset] points spanning from [startOffset] to [endOffset].
+ *
+ * Iterating walks the integer grid row by row (incrementing x, then wrapping to the next y), while
+ * [random] returns a uniformly random point inside the rectangle.
+ *
+ * @param startOffset the inclusive top-left corner of the range.
+ * @param endOffset the bottom-right corner of the range.
+ */
 class OffsetRange(
     private val startOffset: Offset,
     private val endOffset: Offset
@@ -11,6 +20,7 @@ class OffsetRange(
         return OffsetIterator()
     }
 
+    /** Iterates the integer grid of points in the range, row by row. */
     inner class OffsetIterator : Iterator<Pair<Float, Float>> {
         private var currentX = startOffset.x
         private var currentY = startOffset.y
@@ -30,6 +40,7 @@ class OffsetRange(
         }
     }
 
+    /** Returns a uniformly random [Offset] within the range. */
     fun random(): Offset {
         val xRandom = (startOffset.x.toInt()..endOffset.x.toInt()).random().toFloat()
         val yRandom = (startOffset.y.toInt()..endOffset.y.toInt()).random().toFloat()

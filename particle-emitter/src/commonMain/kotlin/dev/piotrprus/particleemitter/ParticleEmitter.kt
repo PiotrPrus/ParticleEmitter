@@ -28,6 +28,23 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.random.Random
 
+/**
+ * A Compose layout-based particle emitter whose particles are arbitrary `@Composable` content.
+ *
+ * Each particle hosts the composable supplied by [EmitterConfig.particle] (text, an image, an icon,
+ * a whole component…) and is moved with `Modifier.offset` along a kinematic trajectory while spinning
+ * via `graphicsLayer`. This is the right choice when particles must be real UI; for large counts of
+ * lightweight shapes, prefer the `Canvas`-based [CanvasParticleEmitter].
+ *
+ * The emitter performs a single finite run of [EmitterConfig.particlesCount] particles — emitted all
+ * at once or staggered over [EmitterConfig.emitDurationMillis] — and removes each particle when its
+ * lifespan ends. To replay, supply a new [config] instance. See [MultiEmitter] to chain several runs.
+ *
+ * @param modifier the [Modifier] applied to the emitter container.
+ * @param config the [EmitterConfig] describing count, timing, physics, and the particle composable.
+ * @param onAnimationFinished invoked once, after the last particle of the run has completed its
+ * lifespan.
+ */
 @Composable
 fun ParticlesEmitter(
     modifier: Modifier = Modifier,
@@ -100,7 +117,6 @@ fun ParticlesEmitter(
                     onLifeEnded = {
                         particles.remove(item)
                         if (item.id == "${config.particlesCount - 1}") {
-                            println("AAAA, last particle emitted")
                             onAnimationFinished()
                         }
                     })
@@ -109,6 +125,19 @@ fun ParticlesEmitter(
     }
 }
 
+/**
+ * Renders and animates one [Particle] for [ParticlesEmitter].
+ *
+ * Drives the particle's position with projectile kinematics — initial velocity from
+ * [Particle.initialForce] and [Particle.angle], plus constant gravity acceleration derived from
+ * [Particle.gravityStrength] and [Particle.gravityAngle] — applies a looping rotation scaled by
+ * [Particle.rotationMultiplier], and calls [onLifeEnded] once [Particle.lifespanMillis] elapses.
+ * Exposed mainly as a building block; most callers use [ParticlesEmitter] or [MultiEmitter].
+ *
+ * @param particle the particle state to render.
+ * @param startingPoint the emission origin, in pixels, within the parent bounds.
+ * @param onLifeEnded invoked when the particle's lifespan ends so the host can remove it.
+ */
 @Composable
 fun SingleParticleContainer(
     particle: Particle,

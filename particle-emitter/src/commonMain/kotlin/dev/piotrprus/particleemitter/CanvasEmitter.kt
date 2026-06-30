@@ -21,6 +21,27 @@ import kotlinx.coroutines.withContext
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * A high-performance, `Canvas`-based particle emitter.
+ *
+ * Particles are simulated every animation frame and drawn directly into a single `drawBehind`
+ * layer, which makes this emitter suitable for large counts (1 000+) of lightweight particles such
+ * as circles, tinted images, text, or custom paths. For particles that must themselves be arbitrary
+ * `@Composable` content, use [ParticlesEmitter] instead.
+ *
+ * The emitter runs continuously: it spawns [CanvasEmitterConfig.particlePerSecond] particles per
+ * second, advances each one with incremental Euler integration (`v += a·dt`, `p += v·dt`) using the
+ * gravity vector derived from [CanvasEmitterConfig.gravityStrength] and
+ * [CanvasEmitterConfig.gravityAngle], applies the configured [EdgeBehavior] at the composable
+ * bounds, and removes each particle once it outlives its randomized lifespan.
+ *
+ * @param modifier the [Modifier] applied to the emitter surface. The emitter fills the available
+ * space and uses the resulting size as the simulation bounds, so pass a sizing modifier such as
+ * `Modifier.fillMaxSize()`.
+ * @param config the [CanvasEmitterConfig] describing emission rate, particle appearance, physics,
+ * and edge behavior. Updating the config while the emitter is composed is picked up on the next
+ * frame without restarting the simulation.
+ */
 @Composable
 fun CanvasParticleEmitter(modifier: Modifier, config: CanvasEmitterConfig) {
 

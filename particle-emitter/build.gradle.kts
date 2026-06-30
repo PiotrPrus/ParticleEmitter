@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.dokka)
 }
 
 kotlin {
@@ -85,5 +86,24 @@ mavenPublishing {
             connection.set("scm:git:git://github.com/PiotrPrus/ParticleEmitter.git")
             developerConnection.set("scm:git:ssh://git@github.com/PiotrPrus/ParticleEmitter.git")
         }
+    }
+}
+
+dokka {
+    moduleName.set("ParticleEmitter")
+
+    dokkaSourceSets.configureEach {
+        // Link generated pages back to the source on GitHub.
+        sourceLink {
+            localDirectory.set(file("src"))
+            remoteUrl("https://github.com/PiotrPrus/ParticleEmitter/tree/main/particle-emitter/src")
+            remoteLineSuffix.set("#L")
+        }
+        // Surface the README on the module's landing page.
+        includes.from("Module.md")
+    }
+
+    pluginsConfiguration.html {
+        footerMessage.set("© 2024–2026 Piotr Prus · ParticleEmitter — Apache 2.0")
     }
 }
