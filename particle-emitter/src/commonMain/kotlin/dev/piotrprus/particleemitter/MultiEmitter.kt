@@ -11,6 +11,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 
+/**
+ * Orchestrates several [ParticlesEmitter] runs from a shared [EmitterConfig], launched one after
+ * another with a fixed delay between them.
+ *
+ * Use it for staggered bursts — for example a confetti cannon that fires [emitterCount] waves
+ * [emitterDelay] milliseconds apart. Each wave is an independent [ParticlesEmitter] using a copy of
+ * [emitterConfig]; finished waves are removed automatically, and [onAnimationFinished] fires once
+ * the final wave completes.
+ *
+ * @param modifier the [Modifier] applied to each emitter wave.
+ * @param emitterCount how many emitter waves to launch in total.
+ * @param emitterDelay delay, in milliseconds, between the start of consecutive waves.
+ * @param emitterConfig the [EmitterConfig] shared by every wave (its `id` is overridden per wave).
+ * @param onAnimationFinished invoked once after the last wave has finished its animation.
+ */
 @Composable
 fun MultiEmitter(
     modifier: Modifier,

@@ -9,7 +9,18 @@ import androidx.compose.ui.unit.toSize
 import dev.piotrprus.particleemitter.CanvasParticle
 import dev.piotrprus.particleemitter.ParticleShape
 
-fun DrawScope.draw(
+/**
+ * Draws [canvasParticle] into this [DrawScope] according to its [CanvasParticle.shape], applying the
+ * particle's current position, scale, rotation, alpha, and blend mode.
+ *
+ * This is the render step used by [dev.piotrprus.particleemitter.CanvasParticleEmitter] on every
+ * frame. Particles that have effectively faded out or scaled to zero are skipped. Each
+ * [ParticleShape] is dispatched to its specific drawing routine (circle, image, path, or rasterized
+ * text).
+ *
+ * @param canvasParticle the particle to render this frame.
+ */
+internal fun DrawScope.draw(
     canvasParticle: CanvasParticle
 ) {
     if (canvasParticle.alpha <= 0.01f || canvasParticle.scale <= 0.01f) return
@@ -121,7 +132,14 @@ fun DrawScope.draw(
     }
 }
 
-fun ParticleShape.Image.draw(
+/**
+ * Draws this [ParticleShape.Image] for [canvasParticle] into [drawScope], tinted with the particle's
+ * color and transformed by its scale, rotation, and position.
+ *
+ * @param drawScope the target draw scope.
+ * @param canvasParticle the particle providing transform, color, alpha, and blend mode.
+ */
+internal fun ParticleShape.Image.draw(
     drawScope: DrawScope,
     canvasParticle: CanvasParticle,
 ) = with(drawScope) {
@@ -153,7 +171,14 @@ fun ParticleShape.Image.draw(
     }
 }
 
-fun ParticleShape.Circle.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
+/**
+ * Draws this [ParticleShape.Circle] for [canvasParticle] into [drawScope], using the particle's
+ * color, size, alpha, and blend mode, scaled around its current position.
+ *
+ * @param drawScope the target draw scope.
+ * @param canvasParticle the particle providing transform, color, alpha, and blend mode.
+ */
+internal fun ParticleShape.Circle.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
     with(drawScope) {
         val centerX = canvasParticle.currentPosition.x.toPx()
         val centerY = canvasParticle.currentPosition.y.toPx()
@@ -176,7 +201,14 @@ fun ParticleShape.Circle.draw(drawScope: DrawScope, canvasParticle: CanvasPartic
         }
     }
 
-fun ParticleShape.PathShape.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
+/**
+ * Draws this [ParticleShape.PathShape] for [canvasParticle] into [drawScope], filling the path with
+ * the particle's color and transforming it by the particle's scale, rotation, and position.
+ *
+ * @param drawScope the target draw scope.
+ * @param canvasParticle the particle providing transform, color, alpha, and blend mode.
+ */
+internal fun ParticleShape.PathShape.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
     with(drawScope) {
         val centerX = canvasParticle.currentPosition.x.toPx()
         val centerY = canvasParticle.currentPosition.y.toPx()

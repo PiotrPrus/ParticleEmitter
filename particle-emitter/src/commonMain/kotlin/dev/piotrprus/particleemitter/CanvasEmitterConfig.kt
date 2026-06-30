@@ -14,6 +14,15 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
+ * Configuration for [CanvasParticleEmitter] — describes how many particles to emit, where and in
+ * what shape they originate, how they look, and the physics that governs their motion.
+ *
+ * Ranges (such as [lifespanRange], [fadeOutTime], or [spread]) and list properties (such as
+ * [colors], [particleShapes], or [particleSizes]) are sampled randomly per particle, so a single
+ * config can produce a varied, natural-looking effect. All defaults are tuned for a gentle upward
+ * burst with no gravity; override [gravityStrength]/[gravityAngle] for confetti, rain, or bubbles,
+ * and [edgeBehavior] to make particles bounce, stick, or wrap at the emitter bounds.
+ *
  * @param particlePerSecond is number of particles emitted by this source in 1sec. The emission happens every 100ms = 0,1s, so value less then 10 will be neglected.
  * @param emitterCenter is DpOffset for the center of Emitter
  * @param startRegionShape is the shape(path) for emitter. For example Point means every particle will be created at the same place [emitterCenter]
@@ -63,6 +72,12 @@ data class CanvasEmitterConfig(
     val edgeBehavior: EdgeBehavior = EdgeBehavior.None,
     val hideInStartRegion: Boolean = false,
 ) {
+    /**
+     * Returns `true` if [pos] currently falls inside the start region described by
+     * [startRegionShape] and [startRegionSize], centered on [emitterCenter]. Used by the emitter
+     * to honor [hideInStartRegion]. [Shape.POINT], [Shape.H_LINE], and [Shape.V_LINE] have no
+     * interior, so this always returns `false` for them.
+     */
     fun isInsideStartRegion(pos: DpOffset): Boolean {
         val dx = (pos.x - emitterCenter.x).value
         val dy = (pos.y - emitterCenter.y).value
@@ -85,6 +100,12 @@ data class CanvasEmitterConfig(
         }
     }
 
+    /**
+     * A fresh emission point for the next particle, sampled from the perimeter of the start region.
+     * For [Shape.POINT] this is always [emitterCenter]; for the other shapes it is a random point
+     * along the region's circumference, so reading this property repeatedly yields a spread of
+     * origins across the shape.
+     */
     val startPoint: DpOffset
         get() = when (startRegionShape) {
             Shape.OVAL -> getRandomOffsetOnCircle(emitterCenter, startRegionSize)
@@ -147,6 +168,15 @@ data class CanvasEmitterConfig(
     }
 
 
+    /**
+     * The geometry of the emitter's start region — the locus from which particles originate.
+     *
+     * - [OVAL] — particles are emitted from the perimeter of an ellipse (a ring emitter).
+     * - [RECT] — particles are emitted from the perimeter of a rectangle.
+     * - [V_LINE] — a vertical line segment.
+     * - [H_LINE] — a horizontal line segment.
+     * - [POINT] — every particle starts at [emitterCenter].
+     */
     enum class Shape {
         OVAL, RECT, V_LINE, H_LINE, POINT
     }

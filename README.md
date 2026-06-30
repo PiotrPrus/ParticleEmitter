@@ -2,6 +2,8 @@
 
 A Compose Multiplatform particle effects library for Android, iOS, desktop, and web. Create beautiful, physics-based particle animations with two rendering approaches optimized for different use cases.
 
+📖 **[API documentation](https://piotrprus.github.io/ParticleEmitter/)** — generated with Dokka, published on every push to `main`.
+
 ## Features
 
 - **Two rendering engines:**
