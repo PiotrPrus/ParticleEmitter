@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
  * @property rotationMultiplier scales the looping rotation applied while the particle is alive.
  * @property content the `@Composable` rendered for this particle.
  */
-data class Particle(
+internal data class Particle(
     val id: String,
     val angle: Int,
     val initialForce: Int,

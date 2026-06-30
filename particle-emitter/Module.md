@@ -45,8 +45,3 @@ types ([CanvasEmitterConfig][dev.piotrprus.particleemitter.CanvasEmitterConfig],
 [EmitterConfig][dev.piotrprus.particleemitter.EmitterConfig]), and the supporting value types
 [ParticleShape][dev.piotrprus.particleemitter.ParticleShape] and
 [EdgeBehavior][dev.piotrprus.particleemitter.EdgeBehavior].
-
-# Package dev.piotrprus.particleemitter.ui
-
-Canvas drawing helpers — `DrawScope` extensions that render a particle according to its
-[ParticleShape][dev.piotrprus.particleemitter.ParticleShape].

@@ -11,7 +11,7 @@ import androidx.compose.ui.geometry.Offset
  * @param startOffset the inclusive top-left corner of the range.
  * @param endOffset the bottom-right corner of the range.
  */
-class OffsetRange(
+internal class OffsetRange(
     private val startOffset: Offset,
     private val endOffset: Offset
 ) : Iterable<Pair<Float, Float>> {

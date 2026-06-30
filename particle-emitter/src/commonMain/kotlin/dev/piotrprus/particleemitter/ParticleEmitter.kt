@@ -139,7 +139,7 @@ fun ParticlesEmitter(
  * @param onLifeEnded invoked when the particle's lifespan ends so the host can remove it.
  */
 @Composable
-fun SingleParticleContainer(
+internal fun SingleParticleContainer(
     particle: Particle,
     startingPoint: IntOffset = IntOffset.Zero,
     onLifeEnded: () -> Unit

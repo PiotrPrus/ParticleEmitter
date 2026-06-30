@@ -20,7 +20,7 @@ import dev.piotrprus.particleemitter.ParticleShape
  *
  * @param canvasParticle the particle to render this frame.
  */
-fun DrawScope.draw(
+internal fun DrawScope.draw(
     canvasParticle: CanvasParticle
 ) {
     if (canvasParticle.alpha <= 0.01f || canvasParticle.scale <= 0.01f) return
@@ -139,7 +139,7 @@ fun DrawScope.draw(
  * @param drawScope the target draw scope.
  * @param canvasParticle the particle providing transform, color, alpha, and blend mode.
  */
-fun ParticleShape.Image.draw(
+internal fun ParticleShape.Image.draw(
     drawScope: DrawScope,
     canvasParticle: CanvasParticle,
 ) = with(drawScope) {
@@ -178,7 +178,7 @@ fun ParticleShape.Image.draw(
  * @param drawScope the target draw scope.
  * @param canvasParticle the particle providing transform, color, alpha, and blend mode.
  */
-fun ParticleShape.Circle.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
+internal fun ParticleShape.Circle.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
     with(drawScope) {
         val centerX = canvasParticle.currentPosition.x.toPx()
         val centerY = canvasParticle.currentPosition.y.toPx()
@@ -208,7 +208,7 @@ fun ParticleShape.Circle.draw(drawScope: DrawScope, canvasParticle: CanvasPartic
  * @param drawScope the target draw scope.
  * @param canvasParticle the particle providing transform, color, alpha, and blend mode.
  */
-fun ParticleShape.PathShape.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
+internal fun ParticleShape.PathShape.draw(drawScope: DrawScope, canvasParticle: CanvasParticle) =
     with(drawScope) {
         val centerX = canvasParticle.currentPosition.x.toPx()
         val centerY = canvasParticle.currentPosition.y.toPx()

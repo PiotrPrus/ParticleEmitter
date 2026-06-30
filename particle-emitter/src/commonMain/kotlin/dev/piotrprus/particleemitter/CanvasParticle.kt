@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
  * @property scaleAnimConfig precomputed scale animation, driven by elapsed play time.
  * @property alphaAnimConfig precomputed alpha animation, driven by elapsed play time.
  */
-data class CanvasParticle(
+internal data class CanvasParticle(
     val shape: ParticleShape,
     val color: Color,
     val startPoint: DpOffset,
