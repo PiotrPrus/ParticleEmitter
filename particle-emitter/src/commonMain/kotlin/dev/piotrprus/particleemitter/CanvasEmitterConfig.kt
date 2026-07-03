@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
+import kotlin.random.Random
 
 /**
  * Configuration for [CanvasParticleEmitter] — describes how many particles to emit, where and in
@@ -26,7 +28,7 @@ import kotlin.math.sin
  * @param particlePerSecond is number of particles emitted by this source in 1sec. The emission happens every 100ms = 0,1s, so value less then 10 will be neglected.
  * @param emitterCenter is DpOffset for the center of Emitter
  * @param startRegionShape is the shape(path) for emitter. For example Point means every particle will be created at the same place [emitterCenter]
- * @param startRegionSize is DpSize of region where emission happens. The source for each particle will be picked randomly from circumference of the [startRegionShape]
+ * @param startRegionSize is DpSize of region where emission happens. The source for each particle will be picked randomly from the [startRegionShape] — along its circumference for outline shapes ([Shape.OVAL], [Shape.RECT]) or from anywhere inside for solid shapes ([Shape.SOLID_OVAL], [Shape.SOLID_RECT]).
  * @param particleShapes - list of shapes for particles. The emitter will pick randomly from the list of available shapes
  * @param lifespanRange - duration of one particle. It is an IntRange to randomize the particle life
  * @param fadeOutTime - duration of fadeOut animation. Each particle can have random fadeOut time, so it is IntRange
@@ -83,7 +85,7 @@ data class CanvasEmitterConfig(
         val dy = (pos.y - emitterCenter.y).value
         return when (startRegionShape) {
             Shape.POINT -> false
-            Shape.OVAL -> {
+            Shape.OVAL, Shape.SOLID_OVAL -> {
                 val rx = startRegionSize.width.value / 2f
                 val ry = startRegionSize.height.value / 2f
                 if (rx <= 0f || ry <= 0f) return false
@@ -91,7 +93,7 @@ data class CanvasEmitterConfig(
                 val ny = dy / ry
                 nx * nx + ny * ny < 1f
             }
-            Shape.RECT -> {
+            Shape.RECT, Shape.SOLID_RECT -> {
                 val halfW = startRegionSize.width.value / 2f
                 val halfH = startRegionSize.height.value / 2f
                 kotlin.math.abs(dx) < halfW && kotlin.math.abs(dy) < halfH
@@ -101,19 +103,40 @@ data class CanvasEmitterConfig(
     }
 
     /**
-     * A fresh emission point for the next particle, sampled from the perimeter of the start region.
-     * For [Shape.POINT] this is always [emitterCenter]; for the other shapes it is a random point
-     * along the region's circumference, so reading this property repeatedly yields a spread of
-     * origins across the shape.
+     * A fresh emission point for the next particle, sampled from the start region. For [Shape.POINT]
+     * this is always [emitterCenter]; for outline shapes it is a random point along the region's
+     * circumference, and for the solid shapes it is a random point uniformly within the region's
+     * area, so reading this property repeatedly yields a spread of origins across the shape.
      */
     val startPoint: DpOffset
         get() = when (startRegionShape) {
             Shape.OVAL -> getRandomOffsetOnCircle(emitterCenter, startRegionSize)
             Shape.RECT -> getRandomOffsetOnRect(emitterCenter, startRegionSize)
+            Shape.SOLID_OVAL -> getRandomOffsetInOval(emitterCenter, startRegionSize)
+            Shape.SOLID_RECT -> getRandomOffsetInRect(emitterCenter, startRegionSize)
             Shape.V_LINE -> getRandomOffsetOnVertLine(emitterCenter, startRegionSize)
             Shape.H_LINE -> getRandomOffsetOnHorizontalLine(emitterCenter, startRegionSize)
             Shape.POINT -> emitterCenter
         }
+
+    private fun getRandomOffsetInRect(emitterCenter: DpOffset, startRegionSize: DpSize): DpOffset {
+        val halfW = startRegionSize.width.value / 2f
+        val halfH = startRegionSize.height.value / 2f
+        val x = emitterCenter.x.value + (Random.nextFloat() * 2f - 1f) * halfW
+        val y = emitterCenter.y.value + (Random.nextFloat() * 2f - 1f) * halfH
+        return DpOffset(x.dp, y.dp)
+    }
+
+    private fun getRandomOffsetInOval(emitterCenter: DpOffset, startRegionSize: DpSize): DpOffset {
+        val rx = startRegionSize.width.value / 2f
+        val ry = startRegionSize.height.value / 2f
+        // sqrt(random) radius keeps the distribution uniform over area instead of clustering near the center.
+        val radius = sqrt(Random.nextFloat())
+        val angle = Random.nextFloat() * 2f * PI.toFloat()
+        val x = emitterCenter.x.value + radius * rx * cos(angle)
+        val y = emitterCenter.y.value + radius * ry * sin(angle)
+        return DpOffset(x.dp, y.dp)
+    }
 
     private fun getRandomOffsetOnVertLine(emitterCenter: DpOffset, startRegionSize: DpSize): DpOffset {
         val distance = startRegionSize.height.value / 100
@@ -173,11 +196,13 @@ data class CanvasEmitterConfig(
      *
      * - [OVAL] — particles are emitted from the perimeter of an ellipse (a ring emitter).
      * - [RECT] — particles are emitted from the perimeter of a rectangle.
+     * - [SOLID_OVAL] — particles are emitted from anywhere inside the ellipse (uniform over its area).
+     * - [SOLID_RECT] — particles are emitted from anywhere inside the rectangle (uniform over its area).
      * - [V_LINE] — a vertical line segment.
      * - [H_LINE] — a horizontal line segment.
      * - [POINT] — every particle starts at [emitterCenter].
      */
     enum class Shape {
-        OVAL, RECT, V_LINE, H_LINE, POINT
+        OVAL, RECT, V_LINE, H_LINE, POINT, SOLID_OVAL, SOLID_RECT
     }
 }

@@ -3,6 +3,7 @@ package dev.piotrprus.particleemitter.sample
 import dev.piotrprus.particleemitter.sample.screen.BenchmarkSample
 import dev.piotrprus.particleemitter.sample.screen.CanvasSample
 import dev.piotrprus.particleemitter.sample.screen.ConfettiSample
+import dev.piotrprus.particleemitter.sample.screen.DisintegrateSample
 import dev.piotrprus.particleemitter.sample.screen.EmojiRainSample
 import dev.piotrprus.particleemitter.sample.screen.GlowSample
 import dev.piotrprus.particleemitter.sample.screen.GravityPointSample
@@ -90,6 +91,11 @@ fun SamplesNavigation() {
         composable("ring_emitter") {
             SampleScaffold(title = "Ring Emitter", onBack = { navController.popBackStack() }) {
                 RingEmitterSample()
+            }
+        }
+        composable("disintegrate") {
+            SampleScaffold(title = "Disintegrate", onBack = { navController.popBackStack() }) {
+                DisintegrateSample()
             }
         }
         composable("sticky_edges") {
@@ -189,6 +195,11 @@ private val sampleEntries = listOf(
         route = "ring_emitter",
         title = "Ring Emitter",
         description = "Ring start region with 360° spread — toggle hideInStartRegion",
+    ),
+    SampleEntry(
+        route = "disintegrate",
+        title = "Disintegrate",
+        description = "Tap a solid shape to blow it apart — SOLID_RECT / SOLID_OVAL start regions",
     ),
     SampleEntry(
         route = "sticky_edges",

@@ -15,7 +15,7 @@ A Compose Multiplatform particle effects library for Android, iOS, desktop, and 
 - **Edge behavior** — Particles can bounce, stick, or wrap at screen boundaries
 - **Blend modes** — Additive, screen, and other blend effects for glowing particles
 - **Multi-emitter orchestration** — Sequential or overlapping emitters with `MultiEmitter`
-- **Emitter source shapes** — Point, oval, rectangle, vertical/horizontal lines
+- **Emitter source shapes** — Point, oval, rectangle, vertical/horizontal lines, plus filled `SOLID_OVAL` / `SOLID_RECT` that emit from the whole area
 
 ## Performance
 
@@ -189,13 +189,42 @@ CanvasEmitterConfig(
 
 Edge collision accounts for particle size — the visual edge of the particle touches the boundary, not the center.
 
+## Start Region Shapes
+
+`startRegionShape` controls *where* inside the `startRegionSize` box each particle is born, centered on `emitterCenter`. Outline shapes spawn along the perimeter; solid shapes spawn uniformly across the whole filled area.
+
+| Shape | Emission | Notes |
+|-------|----------|-------|
+| `POINT` | The single `emitterCenter` point | `startRegionSize` is ignored |
+| `OVAL` | The perimeter of an ellipse (a ring) | Great for ring emitters with a 360° spread |
+| `RECT` | The perimeter of a rectangle | Hollow outline |
+| `V_LINE` | A vertical line segment | |
+| `H_LINE` | A horizontal line segment | |
+| `SOLID_OVAL` | Anywhere inside the ellipse, uniform over area | Reads as the whole shape turning into particles |
+| `SOLID_RECT` | Anywhere inside the rectangle, uniform over area | Bursts, disintegration, area fills |
+
+The solid variants pick a point *inside* the region rather than on its edge, so a burst looks like the whole body breaking apart instead of just its border. `SOLID_OVAL` samples uniformly over the ellipse's area (no clustering near the center).
+
+```kotlin
+// A filled rectangle that disintegrates from its whole body
+CanvasEmitterConfig(
+    startRegionShape = CanvasEmitterConfig.Shape.SOLID_RECT,
+    startRegionSize = DpSize(200.dp, 150.dp),
+    spread = IntRange(-180, 180),
+    gravityStrength = 550f,
+    // ...
+)
+```
+
+See the **Disintegrate** sample for an interactive `SOLID_RECT` / `SOLID_OVAL` demo.
+
 ## Hide In Start Region
 
 With a ring-shaped emitter (`Shape.OVAL`) and a 360° spread, some of the particles travel *through* the interior of the ring, cluttering the center. Set `hideInStartRegion = true` to skip drawing any particle whose current position is inside the start region — particles that leave the region become visible again on the far side.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `hideInStartRegion` | `Boolean` | `false` | When `true`, particles currently inside the `startRegionShape` + `startRegionSize` bounds are not drawn. Applies to `OVAL` and `RECT` regions. `POINT`, `H_LINE`, and `V_LINE` have no interior and the flag is a no-op. |
+| `hideInStartRegion` | `Boolean` | `false` | When `true`, particles currently inside the `startRegionShape` + `startRegionSize` bounds are not drawn. Applies to the `OVAL`/`SOLID_OVAL` and `RECT`/`SOLID_RECT` regions. `POINT`, `H_LINE`, and `V_LINE` have no interior and the flag is a no-op. |
 
 ```kotlin
 // Ring emitter that keeps its interior clean
