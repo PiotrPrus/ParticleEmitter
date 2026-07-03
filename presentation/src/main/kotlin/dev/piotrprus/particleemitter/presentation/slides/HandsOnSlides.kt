@@ -100,67 +100,68 @@ private fun PlatformCard(name: String, emoji: String) {
 
 val setupSlide = Slide(steps = 3) {
     SlideSurface {
-        SlideTitle("Your turn — new project")
+        SlideTitle("Your turn — scan & go")
+        Spacer(modifier = Modifier.height(40.dp))
+        Reveal(at = 1) {
+            BodyText(
+                "Scan a QR, open the repo, hit \"Use this template\" — you get a project with the " +
+                    "library already wired in and a particle emitter running. No setup. That's it.",
+                color = DeckColors.textSecondary,
+            )
+        }
         Spacer(modifier = Modifier.height(70.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(54.dp)) {
-            Reveal(at = 1) {
-                StepRow(
-                    number = "1",
-                    title = "Android Studio → New Project",
-                    detail = "Pick Empty Activity (Compose) — or the Kotlin Multiplatform template if you want all targets",
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(120.dp, Alignment.CenterHorizontally),
+        ) {
             Reveal(at = 2) {
-                StepRow(
-                    number = "2",
-                    title = "Add the library dependency",
-                    detail = "io.github.piotrprus:particle-emitter:1.1.0 — Maven Central, snippet on the next slide",
+                StarterQrCard(
+                    platform = "🤖  Android",
+                    label = "particle-emitter-android-starter",
+                    data = "https://github.com/PiotrPrus/particle-emitter-android-starter",
                 )
             }
             Reveal(at = 3) {
-                StepRow(
-                    number = "3",
-                    title = "Sync & run",
-                    detail = "Hit Run on the emulator — or ./gradlew :composeApp:run if you went multiplatform",
+                StarterQrCard(
+                    platform = "🌍  Multiplatform",
+                    label = "particle-emitter-kmp-starter",
+                    data = "https://github.com/PiotrPrus/particle-emitter-kmp-starter",
                 )
             }
         }
     }
 }
 
+/** A QR code for a starter template repo, with the platform name above and the repo slug below. */
 @Composable
-private fun StepRow(number: String, title: String, detail: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(40.dp),
-    ) {
+private fun StarterQrCard(platform: String, label: String, data: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = platform,
+            color = DeckColors.textPrimary,
+            fontSize = 34.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(modifier = Modifier.height(24.dp))
         Box(
             modifier = Modifier
-                .size(88.dp)
-                .background(DeckColors.accent, RoundedCornerShape(24.dp)),
+                .size(320.dp)
+                .background(Color.White, RoundedCornerShape(28.dp))
+                .padding(26.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = number,
-                color = Color.White,
-                fontSize = 44.sp,
-                fontWeight = FontWeight.Bold,
+            Image(
+                painter = rememberQrCodePainter(data),
+                contentDescription = label,
+                modifier = Modifier.fillMaxSize(),
             )
         }
-        Column {
-            Text(
-                text = title,
-                color = DeckColors.textPrimary,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = detail,
-                color = DeckColors.textSecondary,
-                fontSize = 30.sp,
-                lineHeight = 42.sp,
-            )
-        }
+        Spacer(modifier = Modifier.height(22.dp))
+        Text(
+            text = label,
+            color = DeckColors.textSecondary,
+            fontSize = 26.sp,
+        )
     }
 }
 

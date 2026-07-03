@@ -87,10 +87,13 @@ Run with: `./gradlew :presentation:run`
 - Transition to hands-on part here.
 
 ## 13. Setup (guide them, ~10 min)
-- Straight from Android Studio — no website, no wizard. New Project →
-  Empty Activity (Compose) for the simple path, or the Kotlin Multiplatform
-  template for people who want all targets.
-- Step 2 is just adding the Maven Central dependency — snippet on the next slide.
+- Easiest possible start: scan a QR, open the repo on GitHub, hit "Use this
+  template" — you get a project with the library already wired in and an
+  emitter running. No wizard, no dependency hunting.
+- Two QR codes: Android-only starter (particle-emitter-android-starter) and the
+  Kotlin Multiplatform starter (particle-emitter-kmp-starter, all targets).
+- Next slide shows the raw dependency snippet for anyone adding it to an
+  existing project instead of using a template.
 - Walk the room; pair people with broken Gradle syncs.
 
 ## 14. Dependency
