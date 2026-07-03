@@ -5,9 +5,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 import dev.piotrprus.particleemitter.CanvasParticle
 import dev.piotrprus.particleemitter.ParticleShape
+import kotlin.math.roundToInt
 
 /**
  * Draws [canvasParticle] into this [DrawScope] according to its [CanvasParticle.shape], applying the
@@ -51,6 +54,10 @@ internal fun DrawScope.draw(
             val centerX = canvasParticle.currentPosition.x.toPx()
             val centerY = canvasParticle.currentPosition.y.toPx()
             val colorFilter = ColorFilter.tint(color = canvasParticle.color)
+            // Resize the bitmap to the particle's configured size so particleSizes is respected,
+            // regardless of the source asset's intrinsic resolution.
+            val width = canvasParticle.size.width.toPx().roundToInt()
+            val height = canvasParticle.size.height.toPx().roundToInt()
             withTransform({
                 scale(
                     scaleX = canvasParticle.scale,
@@ -61,13 +68,14 @@ internal fun DrawScope.draw(
                     degrees = canvasParticle.rotation * canvasParticle.scale,
                     Offset(centerX, centerY)
                 )
-                translate(
-                    left = centerX - canvasParticle.shape.imageBitmap.width / 2,
-                    top = centerY - canvasParticle.shape.imageBitmap.height / 2
-                )
             }) {
                 drawImage(
                     image = canvasParticle.shape.imageBitmap,
+                    dstOffset = IntOffset(
+                        x = (centerX - width / 2f).roundToInt(),
+                        y = (centerY - height / 2f).roundToInt()
+                    ),
+                    dstSize = IntSize(width, height),
                     blendMode = canvasParticle.blendMode,
                     alpha = canvasParticle.alpha,
                     colorFilter = colorFilter,
@@ -146,6 +154,10 @@ internal fun ParticleShape.Image.draw(
     val centerX = canvasParticle.currentPosition.x.toPx()
     val centerY = canvasParticle.currentPosition.y.toPx()
     val colorFilter = ColorFilter.tint(color = canvasParticle.color)
+    // Resize the bitmap to the particle's configured size so particleSizes is respected,
+    // regardless of the source asset's intrinsic resolution.
+    val width = canvasParticle.size.width.toPx().roundToInt()
+    val height = canvasParticle.size.height.toPx().roundToInt()
     withTransform({
         scale(
             scaleX = canvasParticle.scale,
@@ -156,13 +168,14 @@ internal fun ParticleShape.Image.draw(
             degrees = canvasParticle.rotation * canvasParticle.scale,
             Offset(centerX, centerY)
         )
-        translate(
-            left = centerX - imageBitmap.width / 2,
-            top = centerY - imageBitmap.height / 2
-        )
     }) {
         drawImage(
             image = imageBitmap,
+            dstOffset = IntOffset(
+                x = (centerX - width / 2f).roundToInt(),
+                y = (centerY - height / 2f).roundToInt()
+            ),
+            dstSize = IntSize(width, height),
             blendMode = canvasParticle.blendMode,
             alpha = canvasParticle.alpha,
             colorFilter = colorFilter,
