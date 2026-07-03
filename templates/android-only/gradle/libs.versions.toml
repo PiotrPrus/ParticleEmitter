@@ -1,0 +1,31 @@
+[versions]
+agp = "9.0.1"
+kotlin = "2.3.21"
+compose-multiplatform = "1.11.0"
+compose-material3 = "1.11.0-alpha07"
+androidx-core-ktx = "1.15.0"
+androidx-activity-compose = "1.13.0"
+android-minSdk = "24"
+android-compileSdk = "36"
+android-targetSdk = "35"
+particle-emitter = "1.1.0"
+
+[libraries]
+# The ParticleEmitter library from Maven Central — this is the whole point of the template.
+particle-emitter = { module = "io.github.piotrprus:particle-emitter", version.ref = "particle-emitter" }
+
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+
+# Compose Multiplatform artifacts. On Android these redirect to the equivalent androidx.compose
+# artifacts, so they match exactly what the library was built against (no version skew).
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-multiplatform" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
