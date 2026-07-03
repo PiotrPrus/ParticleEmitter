@@ -39,7 +39,7 @@ import org.jetbrains.compose.resources.imageResource
 fun CanvasSample() {
     val density = LocalDensity.current
     val imageBitmap = imageResource(Res.drawable.star_four)
-    var birthRate by remember { mutableStateOf(100f) }
+    var birthRate by remember { mutableStateOf(40f) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -60,20 +60,24 @@ fun CanvasSample() {
                         startRegionShape = CanvasEmitterConfig.Shape.OVAL,
                         startRegionSize = avatarSize * 0.8f,
                         particleShapes = listOf(ParticleShape.Image(imageBitmap)),
-                        lifespanRange = IntRange(1000, 1500),
+                        // Long life + a big scale ramp make the per-particle size change easy to
+                        // watch: each star starts at particleSizes (10.dp) and grows ~5x over its
+                        // lifetime, which only looks right because the image is resized to the
+                        // configured size instead of the bitmap's intrinsic pixels.
+                        lifespanRange = IntRange(4000, 6000),
                         colors = listOf(
                             Color(0xff53FF00), Color(0xffE5FF5E), Color(0xff4AC2FF)
                         ),
                         blendMode = BlendMode.Screen,
                         scaleEasing = EaseOutCubic,
-                        particleSizes = listOf(DpSize(8.dp, 8.dp)),
-                        initialForce = IntRange(40, 100),
+                        particleSizes = listOf(DpSize(10.dp, 10.dp)),
+                        initialForce = IntRange(20, 60),
                         spread = IntRange(-180, 180),
-                        fadeOutTime = IntRange(700, 1000),
+                        fadeOutTime = IntRange(4000, 6000),
                         rotationRange = IntRange(0, 90),
-                        scaleTime = IntRange(500, 700),
-                        targetScaleRange = IntRange(0, 1),
-                        startScaleRange = IntRange(2, 3),
+                        scaleTime = IntRange(4000, 6000),
+                        targetScaleRange = IntRange(4, 6),
+                        startScaleRange = IntRange(1, 1),
                     )
                 )
             }
