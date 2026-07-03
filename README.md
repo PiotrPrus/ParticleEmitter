@@ -21,6 +21,15 @@ A Compose Multiplatform particle effects library for Android, iOS, desktop, and 
 
 See [PERFORMANCE.md](PERFORMANCE.md) for measured particle-count budgets per target frame rate (30 / 60 / 120 FPS), benchmark methodology, and sizing guidance for `CanvasParticleEmitter` on real hardware.
 
+## Starter templates
+
+Want a project pre-wired with the library? Use one of the starter template repos — click **Use this
+template** on GitHub to create your own copy. Each shows the simplest possible scene: a single
+`CanvasParticleEmitter` centered on screen.
+
+- [**particle-emitter-android-starter**](https://github.com/PiotrPrus/particle-emitter-android-starter) — a minimal Android app.
+- [**particle-emitter-kmp-starter**](https://github.com/PiotrPrus/particle-emitter-kmp-starter) — Compose Multiplatform for Android, iOS, Desktop (JVM), macOS, and Web.
+
 ## Installation
 
 For Android projects, add the dependency to your module's build file:
