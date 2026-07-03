@@ -60,7 +60,7 @@ fun CanvasSample() {
                         startRegionShape = CanvasEmitterConfig.Shape.OVAL,
                         startRegionSize = avatarSize * 0.8f,
                         particleShapes = listOf(ParticleShape.Image(imageBitmap)),
-                        // Each star starts at particleSizes (10.dp) and grows ~5x via the scale
+                        // Each star starts at its particleSizes entry and grows 2x via the scale
                         // ramp — which only looks right because the image is resized to the
                         // configured size instead of the bitmap's intrinsic pixels.
                         lifespanRange = IntRange(1000, 1500),
@@ -69,13 +69,18 @@ fun CanvasSample() {
                         ),
                         blendMode = BlendMode.Screen,
                         scaleEasing = EaseOutCubic,
-                        particleSizes = listOf(DpSize(10.dp, 10.dp)),
+                        particleSizes = listOf(
+                            DpSize(3.dp, 3.dp),
+                            DpSize(5.dp, 5.dp),
+                            DpSize(7.dp, 7.dp),
+                            DpSize(9.dp, 9.dp),
+                        ),
                         initialForce = IntRange(40, 100),
                         spread = IntRange(-180, 180),
                         fadeOutTime = IntRange(700, 1000),
                         rotationRange = IntRange(0, 90),
                         scaleTime = IntRange(500, 700),
-                        targetScaleRange = IntRange(4, 6),
+                        targetScaleRange = IntRange(2, 2),
                         startScaleRange = IntRange(1, 1),
                     )
                 )
