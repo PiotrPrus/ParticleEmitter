@@ -34,7 +34,7 @@ import kotlin.random.Random
  * @param fadeOutTime - duration of fadeOut animation. Each particle can have random fadeOut time, so it is IntRange
  * @param scaleTime - duration of scaling animation. Use [startScaleRange] and [targetScaleRange] to control the parameters of particle scale
  * @param colors - a list of colors that each particle will randomly pick from
- * @param particleSizes - a list of sizes in [DpSize] for each particle. It will be picked randomly from available sizes. The size can be also manipulated using [startScaleRange] and [targetScaleRange]
+ * @param particleSizes - a list of sizes in [DpSize] for each particle. It will be picked randomly from available sizes. The size applies to every [ParticleShape] — including [ParticleShape.Image], whose bitmap is resized to this size regardless of the source asset's intrinsic resolution. The size can be also manipulated using [startScaleRange] and [targetScaleRange]
  * @param spread - range of angles (in degrees) that describe the direction of path for each particle. 0 degrees points upward (top of the screen)
  * @param blendMode - applied [BlendMode] on each particle
  * @param alphaEasing - an easing curve that is applied for alpha animation on each particle
