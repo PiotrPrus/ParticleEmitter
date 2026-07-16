@@ -38,6 +38,7 @@ import dev.piotrprus.particleemitter.presentation.demos.DisintegratingBoxDemo
 import dev.piotrprus.particleemitter.presentation.demos.FlameDemo
 import dev.piotrprus.particleemitter.presentation.demos.MagicWandDemo
 import dev.piotrprus.particleemitter.presentation.demos.MatrixRainDemo
+import dev.piotrprus.particleemitter.presentation.demos.UnstableLightsaberDemo
 import dev.piotrprus.particleemitter.presentation.ui.BodyText
 import dev.piotrprus.particleemitter.presentation.ui.Bullet
 import dev.piotrprus.particleemitter.presentation.ui.CodeBlock
@@ -315,6 +316,31 @@ val inspirationSlide = Slide(steps = 4) {
                 "Use your imagination and build something awesome with me (and the library). Get featured on socials and/or in library examples",
                 color = DeckColors.textSecondary,
             )
+        }
+    }
+}
+
+val starWarsSlide = Slide(steps = 1) {
+    SlideSurface {
+        SlideTitle("An unstable lightsaber ⚔️")
+        Spacer(modifier = Modifier.height(40.dp))
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(60.dp),
+        ) {
+            Box(modifier = Modifier.weight(1f)) {
+                InspirationCard("Kylo Ren's crossguard saber") {
+                    UnstableLightsaberDemo()
+                }
+            }
+            Reveal(at = 1, modifier = Modifier.weight(1.15f)) {
+                Column(verticalArrangement = Arrangement.spacedBy(26.dp)) {
+                    Bullet("Line emitters along the blade + both quillons")
+                    Bullet("Plasma vents perpendicularly, left and right")
+                    Bullet("Ultra-short life + additive blend = a white-hot core, crimson edges")
+                    Bullet("Blade axis jitters and emission spikes at random — it sputters")
+                }
+            }
         }
     }
 }

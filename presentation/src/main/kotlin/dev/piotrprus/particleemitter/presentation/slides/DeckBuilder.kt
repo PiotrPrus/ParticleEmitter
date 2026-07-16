@@ -19,6 +19,7 @@ fun deckSlides(): List<Slide> = listOf(
     dependencySlide,
     firstEmitterSlide,
     inspirationSlide,
+    starWarsSlide,
     closingSlide,
     bonusSlide,
 )

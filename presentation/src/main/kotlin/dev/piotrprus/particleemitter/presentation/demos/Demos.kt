@@ -30,6 +30,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.onSizeChanged
@@ -46,6 +47,7 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
 import kotlinx.coroutines.delay
 import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
@@ -873,6 +875,212 @@ fun DisintegratingBoxDemo(modifier: Modifier = Modifier) {
             )
         }
     }
+}
+
+// White-hot core, crimson crackle, ashy embers. The library gives each particle
+// one fixed color (no color-over-life), so we fake the white->red->ash gradient
+// by layering emitters and letting additive blending pile brightness into a
+// white core while the sparse edges stay red.
+private val KyloCoreColors = listOf(Color(0xFFFFFFFF), Color(0xFFFFF3C0), Color(0xFFFFD54F))
+private val KyloCrackleColors = listOf(
+    Color(0xFFFF1E1E), Color(0xFFFF4500), Color(0xFFFF6A00), Color(0xFFD50000),
+)
+private val KyloEmberColors = listOf(Color(0xFF8E0000), Color(0xFF5A0000), Color(0xFF440000))
+
+/**
+ * Kylo Ren's unstable lightsaber: a volatile crimson blade that vents plasma
+ * erratically instead of holding a clean beam. Built from layered line emitters
+ * along the blade (and the two crossguard quillons):
+ *  - a white-hot core (ultra-short life, low speed, additive) that piles into a
+ *    blinding centre,
+ *  - crimson crackle venting perpendicularly left and right at high, randomized
+ *    speed with very short life so it burns out instantly,
+ *  - dark ashy embers drifting a touch further.
+ * The blade axis jitters every frame and the emission rate spikes at random, so
+ * the whole thing sputters and crackles. True curl-noise turbulence isn't
+ * available in the library, so the chaos comes from the axis jitter, wide random
+ * spread, and erratic bursts.
+ */
+@Composable
+fun UnstableLightsaberDemo(modifier: Modifier = Modifier) {
+    val density = LocalDensity.current
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
+    var jitterX by remember { mutableStateOf(0f) }
+    var spike by remember { mutableStateOf(1f) }
+    var flicker by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            withFrameNanos {
+                // unstable blade axis: small chaotic horizontal wobble every frame
+                jitterX = (Random.nextFloat() - 0.5f) * 12f
+                // erratic micro-bursts: random emission spikes
+                spike = if (Random.nextFloat() < 0.18f) 1.8f + Random.nextFloat() * 2.2f else 1f
+                // slight blade-length flicker
+                flicker = Random.nextFloat()
+            }
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize().onSizeChanged { containerSize = it }) {
+        if (containerSize != IntSize.Zero) {
+            val w = containerSize.width.toFloat()
+            val h = containerSize.height.toFloat()
+            val cxPx = w / 2f + jitterX
+            val hiltYPx = h * 0.86f
+            val tipYPx = h * (0.14f + 0.015f * flicker) // flickering tip
+            val bladeLenPx = hiltYPx - tipYPx
+            val bladeCenterYPx = (hiltYPx + tipYPx) / 2f
+            val guardYPx = hiltYPx - h * 0.055f
+            val guardHalfPx = w * 0.065f
+
+            val cxDp = with(density) { cxPx.toDp() }
+            val bladeCenterYDp = with(density) { bladeCenterYPx.toDp() }
+            val bladeLenDp = with(density) { bladeLenPx.toDp() }
+            val guardYDp = with(density) { guardYPx.toDp() }
+
+            // 1) White-hot core along the blade — tight, blinding, ultra-short life.
+            CanvasParticleEmitter(
+                modifier = Modifier.fillMaxSize(),
+                config = CanvasEmitterConfig(
+                    particlePerSecond = (900 * spike).toInt(),
+                    emitterCenter = DpOffset(cxDp, bladeCenterYDp),
+                    startRegionShape = CanvasEmitterConfig.Shape.SOLID_RECT,
+                    startRegionSize = DpSize(20.dp, bladeLenDp),
+                    particleShapes = listOf(ParticleShape.Circle),
+                    lifespanRange = 50..150,
+                    fadeOutTime = 50..140,
+                    scaleTime = 40..120,
+                    colors = KyloCoreColors,
+                    particleSizes = listOf(DpSize(3.dp, 3.dp), DpSize(5.dp, 5.dp), DpSize(7.dp, 7.dp)),
+                    spread = IntRange(-180, 180),
+                    blendMode = BlendMode.Plus,
+                    initialForce = IntRange(10, 70),
+                    scaleEasing = EaseOutCubic,
+                    startScaleRange = IntRange(1, 1),
+                    targetScaleRange = IntRange(0, 0),
+                    gravityStrength = 0f,
+                ),
+            )
+            // 2) Crimson crackle venting to the RIGHT (perpendicular to the blade).
+            SaberVent(
+                center = DpOffset(cxDp, bladeCenterYDp),
+                region = DpSize(20.dp, bladeLenDp),
+                colors = KyloCrackleColors,
+                spread = IntRange(45, 135),
+                spike = spike,
+            )
+            // 3) Crimson crackle venting to the LEFT.
+            SaberVent(
+                center = DpOffset(cxDp, bladeCenterYDp),
+                region = DpSize(20.dp, bladeLenDp),
+                colors = KyloCrackleColors,
+                spread = IntRange(-135, -45),
+                spike = spike,
+            )
+            // 4) Ashy embers — darker, a hair longer-lived, drifting slightly up (heat).
+            CanvasParticleEmitter(
+                modifier = Modifier.fillMaxSize(),
+                config = CanvasEmitterConfig(
+                    particlePerSecond = (160 * spike).toInt(),
+                    emitterCenter = DpOffset(cxDp, bladeCenterYDp),
+                    startRegionShape = CanvasEmitterConfig.Shape.SOLID_RECT,
+                    startRegionSize = DpSize(20.dp, bladeLenDp),
+                    particleShapes = listOf(ParticleShape.Circle),
+                    lifespanRange = 180..320,
+                    fadeOutTime = 150..300,
+                    scaleTime = 100..220,
+                    colors = KyloEmberColors,
+                    particleSizes = listOf(DpSize(2.dp, 2.dp), DpSize(3.dp, 3.dp)),
+                    spread = IntRange(-180, 180),
+                    blendMode = BlendMode.Plus,
+                    initialForce = IntRange(120, 340),
+                    scaleEasing = EaseOutCubic,
+                    startScaleRange = IntRange(1, 1),
+                    targetScaleRange = IntRange(0, 0),
+                    gravityStrength = 40f,
+                    gravityAngle = 180, // slight upward lift, like rising heat
+                ),
+            )
+            // 5) The two crossguard quillons venting sideways.
+            SaberVent(
+                center = DpOffset(with(density) { (cxPx - guardHalfPx / 2f).toDp() }, guardYDp),
+                region = DpSize(guardHalfPx.let { with(density) { it.toDp() } }, 8.dp),
+                colors = KyloCrackleColors,
+                spread = IntRange(-135, -45),
+                spike = spike,
+                rate = 180,
+            )
+            SaberVent(
+                center = DpOffset(with(density) { (cxPx + guardHalfPx / 2f).toDp() }, guardYDp),
+                region = DpSize(guardHalfPx.let { with(density) { it.toDp() } }, 8.dp),
+                colors = KyloCrackleColors,
+                spread = IntRange(45, 135),
+                spike = spike,
+                rate = 180,
+            )
+
+            // The blade + hilt drawn under the plasma: a red glow with a hot core.
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val tip = Offset(cxPx, tipYPx)
+                val hilt = Offset(cxPx, hiltYPx)
+                // blade glow -> core (thick, molten-looking beam)
+                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.30f), tip, hilt, strokeWidth = 70f, cap = StrokeCap.Round)
+                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.45f), tip, hilt, strokeWidth = 46f, cap = StrokeCap.Round)
+                drawLine(Color(0xFFFF3B30), tip, hilt, strokeWidth = 26f, cap = StrokeCap.Round)
+                drawLine(Color(0xFFFFE0B2), tip, hilt, strokeWidth = 11f, cap = StrokeCap.Round)
+                // crossguard quillons
+                val gl = Offset(cxPx - guardHalfPx, guardYPx)
+                val gr = Offset(cxPx + guardHalfPx, guardYPx)
+                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.30f), gl, gr, strokeWidth = 46f, cap = StrokeCap.Round)
+                drawLine(Color(0xFFFF3B30), gl, gr, strokeWidth = 18f, cap = StrokeCap.Round)
+                drawLine(Color(0xFFFFE0B2), gl, gr, strokeWidth = 8f, cap = StrokeCap.Round)
+                // metal hilt below the emitter
+                drawLine(
+                    Color(0xFF2B2B2B),
+                    hilt,
+                    Offset(cxPx, hiltYPx + h * 0.1f),
+                    strokeWidth = 26f,
+                    cap = StrokeCap.Round,
+                )
+            }
+        }
+    }
+}
+
+/** One crimson venting layer for [UnstableLightsaberDemo], spawned along [region]. */
+@Composable
+private fun SaberVent(
+    center: DpOffset,
+    region: DpSize,
+    colors: List<Color>,
+    spread: IntRange,
+    spike: Float,
+    rate: Int = 600,
+) {
+    CanvasParticleEmitter(
+        modifier = Modifier.fillMaxSize(),
+        config = CanvasEmitterConfig(
+            particlePerSecond = (rate * spike).toInt(),
+            emitterCenter = center,
+            startRegionShape = CanvasEmitterConfig.Shape.SOLID_RECT,
+            startRegionSize = region,
+            particleShapes = listOf(ParticleShape.Circle),
+            lifespanRange = 60..190,
+            fadeOutTime = 60..180,
+            scaleTime = 50..150,
+            colors = colors,
+            particleSizes = listOf(DpSize(3.dp, 3.dp), DpSize(5.dp, 5.dp), DpSize(8.dp, 8.dp)),
+            spread = spread,
+            blendMode = BlendMode.Plus,
+            // shoot out violently; very short life keeps them tight around the blade (fake drag)
+            initialForce = IntRange(120, 360),
+            scaleEasing = EaseOutCubic,
+            startScaleRange = IntRange(1, 1),
+            targetScaleRange = IntRange(0, 0),
+            gravityStrength = 0f,
+        ),
+    )
 }
 
 /** Sparse, slow ambient sparks used behind the title slide. */
