@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,7 +47,6 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
-import kotlinx.coroutines.delay
 import dev.piotrprus.particleemitter.CanvasEmitterConfig
 import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.EdgeBehavior
@@ -102,98 +100,6 @@ fun ConfettiDemo(modifier: Modifier = Modifier, width: Int = 700, height: Int = 
             targetScaleRange = IntRange(1, 1),
             gravityStrength = 320f,
             gravityAngle = 0,
-        ),
-    )
-}
-
-/** Glowing cyan bubbles drifting upwards — gravity pointing up. */
-@Composable
-fun BubblesDemo(modifier: Modifier = Modifier, width: Int = 520, height: Int = 560) {
-    CanvasParticleEmitter(
-        modifier = modifier.fillMaxSize(),
-        config = CanvasEmitterConfig(
-            particlePerSecond = 40,
-            emitterCenter = DpOffset(width.dp / 2, height.dp - 20.dp),
-            startRegionShape = CanvasEmitterConfig.Shape.H_LINE,
-            startRegionSize = DpSize(width.dp - 80.dp, 0.dp),
-            particleShapes = listOf(ParticleShape.Circle),
-            lifespanRange = 2500..4000,
-            fadeOutTime = 800..1400,
-            scaleTime = 1500..2500,
-            colors = listOf(Color(0xFF00E5FF), Color(0xFF18FFFF), Color(0xFF80D8FF)),
-            particleSizes = listOf(DpSize(8.dp, 8.dp), DpSize(14.dp, 14.dp), DpSize(20.dp, 20.dp)),
-            spread = IntRange(-12, 12),
-            blendMode = BlendMode.Screen,
-            initialForce = IntRange(30, 90),
-            startScaleRange = IntRange(0, 1),
-            targetScaleRange = IntRange(1, 2),
-            gravityStrength = 60f,
-            gravityAngle = 180,
-        ),
-    )
-}
-
-/** Emoji snowfall using the Text particle shape. */
-@Composable
-fun EmojiRainDemo(
-    modifier: Modifier = Modifier,
-    emoji: String = "❄️",
-    width: Int = 520,
-    height: Int = 560,
-) {
-    val textMeasurer = rememberTextMeasurer()
-    CanvasParticleEmitter(
-        modifier = modifier.fillMaxSize(),
-        config = CanvasEmitterConfig(
-            particlePerSecond = 25,
-            emitterCenter = DpOffset(width.dp / 2, 0.dp),
-            startRegionShape = CanvasEmitterConfig.Shape.H_LINE,
-            startRegionSize = DpSize(width.dp, 0.dp),
-            particleShapes = listOf(
-                ParticleShape.Text(
-                    text = emoji,
-                    textStyle = TextStyle(fontSize = 28.sp),
-                    textMeasurer = textMeasurer,
-                ),
-            ),
-            lifespanRange = 3000..5000,
-            fadeOutTime = 500..900,
-            scaleTime = 400..700,
-            colors = listOf(Color.White),
-            particleSizes = listOf(DpSize(28.dp, 28.dp), DpSize(20.dp, 20.dp)),
-            spread = IntRange(160, 200),
-            initialForce = IntRange(40, 120),
-            rotationRange = IntRange(-90, 90),
-            startScaleRange = IntRange(1, 1),
-            targetScaleRange = IntRange(1, 1),
-            gravityStrength = 70f,
-            gravityAngle = 0,
-        ),
-    )
-}
-
-/** Ring emitter with additive blending and a clean interior. */
-@Composable
-fun GlowRingDemo(modifier: Modifier = Modifier, width: Int = 520, height: Int = 560) {
-    CanvasParticleEmitter(
-        modifier = modifier.fillMaxSize(),
-        config = CanvasEmitterConfig(
-            particlePerSecond = 120,
-            emitterCenter = DpOffset(width.dp / 2, height.dp / 2),
-            startRegionShape = CanvasEmitterConfig.Shape.OVAL,
-            startRegionSize = DpSize(260.dp, 260.dp),
-            particleShapes = listOf(ParticleShape.Circle),
-            lifespanRange = 900..1600,
-            fadeOutTime = 700..1200,
-            scaleTime = 600..1000,
-            colors = listOf(Color(0xFF7C4DFF), Color(0xFFE040FB), Color(0xFF536DFE)),
-            particleSizes = listOf(DpSize(6.dp, 6.dp), DpSize(10.dp, 10.dp)),
-            spread = IntRange(0, 360),
-            blendMode = BlendMode.Plus,
-            initialForce = IntRange(40, 140),
-            startScaleRange = IntRange(1, 1),
-            targetScaleRange = IntRange(0, 1),
-            hideInStartRegion = true,
         ),
     )
 }
@@ -797,86 +703,6 @@ fun GravityCaseDemo(
     }
 }
 
-private val candyColors = listOf(
-    Color(0xFFFF5252), Color(0xFFFFD740), Color(0xFF69F0AE),
-    Color(0xFF40C4FF), Color(0xFFE040FB), Color(0xFFFFFFFF),
-)
-
-/**
- * A solid blue box sits in the centre; after 2s it disintegrates into a burst
- * of candy particles that pop outward a little, fall under gravity and bounce
- * off the walls with 0.5 damping — settling at the bottom like sweets dropped
- * into a jar. Loops. A bonus eye-candy demo.
- */
-@Composable
-fun DisintegratingBoxDemo(modifier: Modifier = Modifier) {
-    val density = LocalDensity.current
-    var containerSize by remember { mutableStateOf(IntSize.Zero) }
-    var cycle by remember { mutableStateOf(0) }
-    var exploded by remember { mutableStateOf(false) }
-    var bursting by remember { mutableStateOf(false) }
-
-    LaunchedEffect(cycle) {
-        exploded = false
-        bursting = false
-        delay(2000)        // the box waits…
-        exploded = true    // …vanishes…
-        bursting = true    // …and bursts into candies
-        delay(140)         // brief one-shot emission window
-        bursting = false
-        delay(6500)        // let them bounce and settle
-        cycle++            // restart the loop
-    }
-
-    Box(
-        modifier = modifier.fillMaxSize().onSizeChanged { containerSize = it },
-        contentAlignment = Alignment.Center,
-    ) {
-        if (containerSize != IntSize.Zero) {
-            val center = with(density) {
-                DpOffset((containerSize.width / 2).toDp(), (containerSize.height / 2).toDp())
-            }
-            // key() gives each cycle a fresh emitter so old candies clear out
-            key(cycle) {
-                CanvasParticleEmitter(
-                    modifier = Modifier.fillMaxSize(),
-                    config = CanvasEmitterConfig(
-                        particlePerSecond = if (bursting) 2600 else 0,
-                        emitterCenter = center,
-                        startRegionShape = CanvasEmitterConfig.Shape.RECT,
-                        startRegionSize = DpSize(100.dp, 100.dp),
-                        particleShapes = listOf(ParticleShape.Circle),
-                        lifespanRange = 5000..7000,
-                        fadeOutTime = 4500..6500,
-                        scaleTime = 100..200,
-                        colors = candyColors,
-                        particleSizes = listOf(
-                            DpSize(10.dp, 10.dp), DpSize(14.dp, 14.dp), DpSize(8.dp, 8.dp),
-                        ),
-                        spread = IntRange(0, 360),
-                        initialForce = IntRange(60, 200), // pop a little, not crazy
-                        rotationRange = IntRange(-180, 180),
-                        startScaleRange = IntRange(1, 1),
-                        targetScaleRange = IntRange(1, 1),
-                        gravityStrength = 320f,
-                        gravityAngle = 0,
-                        edgeBehavior = EdgeBehavior.Bounce(damping = 0.5f),
-                    ),
-                )
-            }
-        }
-        // the solid blue box, shown until it disintegrates
-        if (!exploded) {
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFF2962FF)),
-            )
-        }
-    }
-}
-
 // White-hot core, crimson crackle, ashy embers. The library gives each particle
 // one fixed color (no color-over-life), so we fake the white->red->ash gradient
 // by layering emitters and letting additive blending pile brightness into a
@@ -1024,17 +850,18 @@ fun UnstableLightsaberDemo(modifier: Modifier = Modifier) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val tip = Offset(cxPx, tipYPx)
                 val hilt = Offset(cxPx, hiltYPx)
-                // blade glow -> core (thick, molten-looking beam)
-                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.30f), tip, hilt, strokeWidth = 70f, cap = StrokeCap.Round)
-                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.45f), tip, hilt, strokeWidth = 46f, cap = StrokeCap.Round)
-                drawLine(Color(0xFFFF3B30), tip, hilt, strokeWidth = 26f, cap = StrokeCap.Round)
-                drawLine(Color(0xFFFFE0B2), tip, hilt, strokeWidth = 11f, cap = StrokeCap.Round)
+                // Blade glow -> core, drawn additively so the beam and the plasma
+                // particles accumulate into one glowing whole (molten, not flat).
+                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.30f), tip, hilt, strokeWidth = 70f, cap = StrokeCap.Round, blendMode = BlendMode.Plus)
+                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.45f), tip, hilt, strokeWidth = 46f, cap = StrokeCap.Round, blendMode = BlendMode.Plus)
+                drawLine(Color(0xFFFF3B30), tip, hilt, strokeWidth = 26f, cap = StrokeCap.Round, blendMode = BlendMode.Plus)
+                drawLine(Color(0xFFFFE0B2), tip, hilt, strokeWidth = 11f, cap = StrokeCap.Round, blendMode = BlendMode.Plus)
                 // crossguard quillons
                 val gl = Offset(cxPx - guardHalfPx, guardYPx)
                 val gr = Offset(cxPx + guardHalfPx, guardYPx)
-                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.30f), gl, gr, strokeWidth = 46f, cap = StrokeCap.Round)
-                drawLine(Color(0xFFFF3B30), gl, gr, strokeWidth = 18f, cap = StrokeCap.Round)
-                drawLine(Color(0xFFFFE0B2), gl, gr, strokeWidth = 8f, cap = StrokeCap.Round)
+                drawLine(Color(0xFFFF1E1E).copy(alpha = 0.30f), gl, gr, strokeWidth = 46f, cap = StrokeCap.Round, blendMode = BlendMode.Plus)
+                drawLine(Color(0xFFFF3B30), gl, gr, strokeWidth = 18f, cap = StrokeCap.Round, blendMode = BlendMode.Plus)
+                drawLine(Color(0xFFFFE0B2), gl, gr, strokeWidth = 8f, cap = StrokeCap.Round, blendMode = BlendMode.Plus)
                 // metal hilt below the emitter
                 drawLine(
                     Color(0xFF2B2B2B),

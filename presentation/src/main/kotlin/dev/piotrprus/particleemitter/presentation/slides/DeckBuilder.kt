@@ -14,12 +14,17 @@ fun deckSlides(): List<Slide> = listOf(
     emissionSlide,
     edgeBehaviorSlide,
     performanceSlide,
-    multiplatformSlide,
-    setupSlide,
+    // add the dependency
     dependencySlide,
-    firstEmitterSlide,
+    // your first emitter
+//    firstEmitterSlide,
+    // flame, matrix, wand
     inspirationSlide,
+    // star wars slide (add my photo there)
     starWarsSlide,
+    // the one that reveal this is the desktop app (add Marton)
+    multiplatformSlide,
+    // Your turn: scan & go
+    setupSlide,
     closingSlide,
-    bonusSlide,
 )

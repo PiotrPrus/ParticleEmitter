@@ -46,6 +46,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
+        alwaysOnTop = true,
         state = windowState,
         title = "ParticleEmitter — GDG London",
         onKeyEvent = { event ->

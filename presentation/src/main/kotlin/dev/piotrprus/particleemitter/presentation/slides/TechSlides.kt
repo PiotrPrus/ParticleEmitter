@@ -108,12 +108,6 @@ val whatIsItSlide = Slide(steps = 4) {
                         text = "Shapes, colors, sizes, blend modes, easing, lifespans",
                     )
                 }
-                Reveal(at = 4) {
-                    Bullet(
-                        emphasis = "Compose Multiplatform",
-                        text = "Android · iOS · Desktop · Web, single artifact since 1.1.0",
-                    )
-                }
             }
             Spacer(modifier = Modifier.width(60.dp))
             DemoCard(modifier = Modifier.weight(0.9f).fillMaxSize()) {

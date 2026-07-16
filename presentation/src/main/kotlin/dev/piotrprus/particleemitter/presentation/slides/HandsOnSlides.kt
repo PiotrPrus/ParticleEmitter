@@ -9,12 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
@@ -34,7 +36,6 @@ import dev.piotrprus.particleemitter.CanvasParticleEmitter
 import dev.piotrprus.particleemitter.ParticleShape
 import dev.piotrprus.particleemitter.presentation.deck.Slide
 import dev.piotrprus.particleemitter.presentation.demos.DemoCard
-import dev.piotrprus.particleemitter.presentation.demos.DisintegratingBoxDemo
 import dev.piotrprus.particleemitter.presentation.demos.FlameDemo
 import dev.piotrprus.particleemitter.presentation.demos.MagicWandDemo
 import dev.piotrprus.particleemitter.presentation.demos.MatrixRainDemo
@@ -43,11 +44,12 @@ import dev.piotrprus.particleemitter.presentation.ui.BodyText
 import dev.piotrprus.particleemitter.presentation.ui.Bullet
 import dev.piotrprus.particleemitter.presentation.ui.CodeBlock
 import dev.piotrprus.particleemitter.presentation.ui.DeckColors
+import dev.piotrprus.particleemitter.presentation.ui.PhotoImage
 import dev.piotrprus.particleemitter.presentation.ui.SlideSurface
 import dev.piotrprus.particleemitter.presentation.ui.SlideTitle
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 
-val multiplatformSlide = Slide(steps = 5) {
+val multiplatformSlide = Slide(steps = 6) {
     SlideSurface {
         SlideTitle("One config, four platforms")
         Spacer(modifier = Modifier.height(90.dp))
@@ -68,12 +70,39 @@ val multiplatformSlide = Slide(steps = 5) {
                 PlatformCard("Web", "🌐")
             }
         }
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(70.dp))
         Reveal(at = 5) {
             BodyText(
                 "Even this presentation is a Compose Desktop app — every demo you saw was live.",
                 color = DeckColors.textSecondary,
             )
+        }
+        Spacer(modifier = Modifier.height(50.dp))
+        Reveal(at = 6) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(30.dp),
+            ) {
+                PhotoImage(
+                    resourcePath = "images/marton.png",
+                    contentDescription = "Marton Braun",
+                    modifier = Modifier.size(220.dp).clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                )
+                Column {
+                    Text(
+                        text = "Marton Braun",
+                        color = DeckColors.textPrimary,
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = "Migrated the library from Android to Compose Multiplatform",
+                        color = DeckColors.textSecondary,
+                        fontSize = 32.sp,
+                    )
+                }
+            }
         }
     }
 }
@@ -106,7 +135,7 @@ val setupSlide = Slide(steps = 3) {
         Reveal(at = 1) {
             BodyText(
                 "Scan a QR, open the repo, hit \"Use this template\" — you get a project with the " +
-                    "library already wired in and a particle emitter running. No setup. That's it.",
+                        "library already wired in and a particle emitter running. No setup. That's it.",
                 color = DeckColors.textSecondary,
             )
         }
@@ -320,7 +349,7 @@ val inspirationSlide = Slide(steps = 4) {
     }
 }
 
-val starWarsSlide = Slide(steps = 1) {
+val starWarsSlide = Slide(steps = 2) {
     SlideSurface {
         SlideTitle("An unstable lightsaber ⚔️")
         Spacer(modifier = Modifier.height(40.dp))
@@ -328,17 +357,28 @@ val starWarsSlide = Slide(steps = 1) {
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(60.dp),
         ) {
-            Box(modifier = Modifier.weight(1f)) {
-                InspirationCard("Kylo Ren's crossguard saber") {
-                    UnstableLightsaberDemo()
+            // Photo first…
+            Reveal(at = 1, modifier = Modifier.weight(1f).fillMaxHeight()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color(0xFF0A0D12))
+                        .border(1.dp, DeckColors.codeBorder, RoundedCornerShape(24.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    PhotoImage(
+                        resourcePath = "images/piotr_starwars.jpg",
+                        contentDescription = "Piotr with the Mandalorian",
+                        modifier = Modifier.fillMaxSize().padding(12.dp),
+                        contentScale = ContentScale.Fit,
+                    )
                 }
             }
-            Reveal(at = 1, modifier = Modifier.weight(1.15f)) {
-                Column(verticalArrangement = Arrangement.spacedBy(26.dp)) {
-                    Bullet("Line emitters along the blade + both quillons")
-                    Bullet("Plasma vents perpendicularly, left and right")
-                    Bullet("Ultra-short life + additive blend = a white-hot core, crimson edges")
-                    Bullet("Blade axis jitters and emission spikes at random — it sputters")
+            // …then the live saber.
+            Reveal(at = 2, modifier = Modifier.weight(1f).fillMaxHeight()) {
+                DemoCard(modifier = Modifier.fillMaxSize()) {
+                    UnstableLightsaberDemo()
                 }
             }
         }
@@ -427,22 +467,6 @@ private fun QrCard(label: String, data: String?) {
             color = DeckColors.textSecondary,
             fontSize = 28.sp,
         )
-    }
-}
-
-val bonusSlide = Slide {
-    SlideSurface {
-        SlideTitle("Bonus — a box of candies 🍬")
-        Spacer(modifier = Modifier.height(40.dp))
-        BodyText(
-            "A 100dp box waits 2s, then bursts into particles: they pop a little, " +
-                "fall under gravity and bounce off the walls (damping 0.5) — like sweets in a jar.",
-            color = DeckColors.textSecondary,
-        )
-        Spacer(modifier = Modifier.height(40.dp))
-        DemoCard(modifier = Modifier.weight(1f).fillMaxWidth()) {
-            DisintegratingBoxDemo()
-        }
     }
 }
 
